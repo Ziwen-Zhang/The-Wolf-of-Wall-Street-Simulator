@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 918c4d0f976c
+Revision ID: d25ec1caac1a
 Revises: 
-Create Date: 2024-11-20 14:21:33.795352
+Create Date: 2024-11-20 16:36:10.029534
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '918c4d0f976c'
+revision = 'd25ec1caac1a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -51,8 +51,9 @@ def upgrade():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('symbol', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=False),
-    sa.Column('price', sa.Integer(), nullable=False),
-    sa.Column('total_value', sa.Integer(), nullable=False),
+    sa.Column('price', sa.Float(), nullable=False),
+    sa.Column('total_shares', sa.Integer(), nullable=False),
+    sa.Column('remaining_shares', sa.Integer(), nullable=False),
     sa.Column('tag_id', sa.Integer(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], ),
@@ -86,7 +87,7 @@ def upgrade():
     )
     op.create_table('user_shares',
     sa.Column('quantity', sa.Float(), nullable=False),
-    sa.Column('average_price', sa.Float(), nullable=True),
+    sa.Column('average_price', sa.Float(), nullable=False),
     sa.Column('stock_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),

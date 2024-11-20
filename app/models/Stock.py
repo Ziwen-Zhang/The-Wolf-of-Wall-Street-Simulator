@@ -12,23 +12,25 @@ class Stock(Base):
     name = db.Column(db.String, nullable=False)
     symbol = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
-    price = db.Column(db.Float, nullable=False)  # 股票价格允许小数
-    total_shares = db.Column(db.Integer, nullable=False)  # 总股票数量
-    remaining_shares = db.Column(db.Integer, nullable=False)  # 剩余股票数量
-    user_shares = db.relationship("Usershare", back_populates="stock")
+    price = db.Column(db.Float, nullable=False) 
 
-    tag = db.relationship("Tag", back_populates="stocks")
+    total_shares = db.Column(db.Integer, nullable=False, default=0)
+    remaining_shares = db.Column(db.Integer, nullable=False)
+    user_shares = db.relationship("Usershare", back_populates="stock",lazy=True)
+
+    tag = db.relationship("Tag", back_populates="stocks",lazy=True)
     tag_id = db.Column(db.Integer, db.ForeignKey(add_prefix_for_prod("tags.id")))
 
     @property
     def total_value(self) -> float:
         return self.price * self.total_shares
+    
     @total_value.setter
     def total_value(self, value: float):
-        if self.total_shares == 0:
-            raise ValueError("Cannot set total_value when total_shares is 0.")
+        if not self.total_shares or self.total_shares == 0:
+            raise ValueError("Cannot set total_value when total_shares is None or 0.")
         self.price = value / self.total_shares
-        
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "id": self.id,

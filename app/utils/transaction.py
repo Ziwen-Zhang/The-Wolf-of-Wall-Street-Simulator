@@ -1,4 +1,4 @@
-from app.models import Usershare, Transaction, db,User,Stock
+from app.models import Usershare, Transaction, db, User, Stock
 
 def process_transaction(user_id, stock_id, quantity, price, transaction_type):
     new_transaction = Transaction(
@@ -22,21 +22,21 @@ def process_transaction(user_id, stock_id, quantity, price, transaction_type):
                 stock_id=stock_id, 
                 quantity=quantity,
                 average_price=price
-                )
-            stock.remaining_shares -= quantity
+            )
             db.session.add(usershare)
         else:
             usershare.update_on_buy(quantity, price)
-            stock.remaining_shares -= quantity
-        user.update_buying_power(-price * quantity) 
-
+        stock.remaining_shares -= quantity
+        user.update_buying_power(-price * quantity)
 
     elif transaction_type == "sell":
+        if not usershare or usershare.quantity < quantity:
+            raise ValueError(f"Not enough shares to sell. Available: {usershare.quantity if usershare else 0}")
         usershare.update_on_sell(quantity)
         stock.remaining_shares += quantity
         user.update_buying_power(price * quantity)
-
     db.session.commit()
+    print(f"[Transaction] {transaction_type.upper()} | User {user_id} | Stock {stock_id} | Quantity {quantity} | Price {price}")
     return usershare
 
 def schedule_transaction(user_id, stock_id, quantity, limit_price, transaction_type):
@@ -45,13 +45,13 @@ def schedule_transaction(user_id, stock_id, quantity, limit_price, transaction_t
         stock_id=stock_id,
         transaction_type=transaction_type,
         limit_price=limit_price,
-    ).first()    
+    ).first()
     if existing_transaction:
         existing_transaction.quantity += quantity
         existing_transaction.total_price += quantity * limit_price
         db.session.commit()
+        print(f"[Schedule] Updated existing transaction: {existing_transaction}")
         return existing_transaction
-
     new_transaction = Transaction(
         quantity=quantity,
         limit_price=limit_price,
@@ -63,4 +63,5 @@ def schedule_transaction(user_id, stock_id, quantity, limit_price, transaction_t
     )
     db.session.add(new_transaction)
     db.session.commit()
+    print(f"[Schedule] Created new transaction: {new_transaction}")
     return new_transaction
