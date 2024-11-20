@@ -9,14 +9,26 @@ from .api.user_routes import user_routes
 from .api.auth_routes import auth_routes
 from .api.stock_routes import stocks_routes
 from .api.save_routes import save_routes
+from .api.transaction_routes import transactions_routes
 from .seeds import seed_commands
 from .config import Config
+from threading import Thread
+from .utils.simulate_transactions import simulate_transactions
 
 app = Flask(__name__, static_folder='../react-vite/dist', static_url_path='/')
 app.json.sort_keys = False
 # Setup login manager
 login = LoginManager(app)
 login.login_view = 'auth.unauthorized'
+
+
+# if __name__ == "app":
+#     transaction_thread = Thread(target=simulate_transactions)
+#     transaction_thread.daemon = True  # 主线程退出时自动关闭
+#     transaction_thread.start()
+#     app.run(debug=True)
+
+
 
 
 @login.user_loader
@@ -32,6 +44,7 @@ app.register_blueprint(user_routes, url_prefix='/api/users')
 app.register_blueprint(auth_routes, url_prefix='/api/auth')
 app.register_blueprint(stocks_routes, url_prefix='/api/stocks')
 app.register_blueprint(save_routes, url_prefix='/api/saves')
+app.register_blueprint(transactions_routes, url_prefix='/api/transactions')
 db.init_app(app)
 Migrate(app, db)
 
