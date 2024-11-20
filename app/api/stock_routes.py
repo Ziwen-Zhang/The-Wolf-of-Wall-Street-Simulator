@@ -1,8 +1,8 @@
-import json
 from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
 from app.models import Stock, db, Transaction,Usershare
 from typing import List
+from ..utils.transaction import process_transaction
 
 stocks_routes = Blueprint("stocks", __name__)
 
@@ -28,32 +28,10 @@ def buy_stock():
     stock_id = data.get("stock_id")
     quantity = data.get("quantity")
     price = data.get("price")
-    user = current_user
 
-    new_transaction = Transaction(
-        quantity=quantity,
-        transaction_price=price,
-        transaction_type="buy",
-        total_price=price * quantity,
-        user_id=user.id,
-        stock_id=stock_id
-    )
-    db.session.add(new_transaction)
+    usershare = process_transaction(current_user, stock_id, quantity, price, "buy")
+    return jsonify({"message": "Transaction success!", "shares": usershare.to_dict_transaction()})
 
-    usershare = Usershare.query.filter_by(user_id=user.id, stock_id=stock_id).first()
-    if not usershare:
-        usershare = Usershare(
-            user_id=user.id,
-            stock_id=stock_id,
-            quantity=quantity
-        )
-        db.session.add(usershare)
-    else:
-        usershare.quantity += quantity
-
-    db.session.commit()
-
-    return jsonify({"message": "Transaction success!", "shares": usershare.to_dict()})
 
 
 @stocks_routes.route("/sell", methods=["POST"])
@@ -63,22 +41,12 @@ def sell_stock():
     stock_id = data.get("stock_id")
     quantity = data.get("quantity")
     price = data.get("price")
-    user = current_user
 
-    new_transaction = Transaction(
-        quantity=quantity,
-        transaction_price=price,
-        transaction_type="sell",
-        total_price=price * quantity,
-        user_id=user.id,
-        stock_id=stock_id
-    )
-    db.session.add(new_transaction)
-    db.session.commit()
+    usershare = process_transaction(current_user, stock_id, quantity, price, "sell")
+    return jsonify({"message": "Transaction success!", "shares": usershare.to_dict_transaction() if usershare.quantity > 0 else None})
+
     
-    usershare = Usershare.query.filter_by(user_id=user.id, stock_id=stock_id).first()
 
-    return jsonify({"message": "Transaction success!", "shares": usershare.to_dict()})
 
 @stocks_routes.route("/portfolio", methods=["GET"])
 @login_required

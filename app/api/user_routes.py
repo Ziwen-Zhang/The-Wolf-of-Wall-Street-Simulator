@@ -4,6 +4,8 @@ from app.models import User
 from app.models import db
 from typing import Any, Dict, List,Optional
 from ..models.types import UserFullDict
+from ..utils.formatting_methods import format_currency
+
 user_routes = Blueprint('users', __name__)
 
 
@@ -43,7 +45,7 @@ def add_fund():
     db.session.commit()
     return jsonify({
         "message": f"Added ${loan_amount} to fund.",
-        "remaining_loan_capacity": 1000000 - user.bank_debt,
+        "remaining_loan_capacity": format_currency(1000000 - user.bank_debt),
         "user": user.to_dict()
     }), 200
 
@@ -66,8 +68,8 @@ def repay_loan():
     db.session.commit()
     return jsonify({
         "message": f"Repaid ${max_repayable} of debt.",
-        "remaining_debt": user.bank_debt,
-        "remaining_buying_power": user.buying_power,
+        "remaining_debt": format_currency(user.bank_debt),
+        "remaining_buying_power": format_currency(user.buying_power),
         "user": user.to_dict()
     }), 200
 

@@ -3,9 +3,8 @@ from .base import HasTimestamps
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from typing import Any, Dict
-from .types import UserFullDict,ShareDict
-from .Usershare import Usershare
-
+from .types import UserFullDict
+from ..utils.formatting_methods import format_currency
 class User(HasTimestamps, UserMixin):
     __tablename__ = "users"
 
@@ -24,46 +23,19 @@ class User(HasTimestamps, UserMixin):
 
     @property
     def total_net_worth(self):
-        total_shares_value = sum(share.quantity * share.calculate_average_price() for share in self.shares)
+        total_shares_value = sum(
+            share.quantity * (share.average_price or 0) 
+            for share in self.shares
+        )
         return self.base_buying_power + total_shares_value
 
     @property
     def buying_power(self) -> float:
-        total_shares_value = sum(share.quantity * share.calculate_average_price() for share in self.shares)
-        return max(self.base_buying_power - total_shares_value, 0)
+        return self.base_buying_power
 
-    @buying_power.setter
-    def buying_power(self, amount: float):
-        self.base_buying_power += amount
+    def update_buying_power(self,amount):
+        self.base_buying_power +=amount
 
-    def update_buying_power(self, amount: float, transaction_type: str):
-        if transaction_type == 'buy':
-            self.base_buying_power -= amount
-        elif transaction_type == 'sell':
-            self.base_buying_power += amount
-        else:
-            raise ValueError("Invalid transaction type: must be 'buy' or 'sell'")
-
-    def add_share(self, stock_id: int, quantity: float, price: float):
-        share = next((share for share in self.shares if share.stock_id == stock_id), None)
-        if share:
-            total_quantity = share.quantity + quantity
-            new_average_price = (
-                (share.quantity * share.average_price) + (quantity * price)
-            ) / total_quantity
-            share.quantity = total_quantity
-            share.average_price = new_average_price
-        else:
-            new_share = Usershare(user_id=self.id, stock_id=stock_id, quantity=quantity, average_price=price)
-            self.shares.append(new_share)
-
-    def remove_share(self, stock_id: int, quantity: float):
-        share = next((share for share in self.shares if share.stock_id == stock_id), None)
-        if not share or share.quantity < quantity:
-            raise ValueError("Insufficient shares to remove")
-        share.quantity -= quantity
-        if share.quantity == 0:
-            self.shares.remove(share)
 
     @property
     def password(self):
@@ -86,9 +58,9 @@ class User(HasTimestamps, UserMixin):
             "last_name": self.last_name,
             "username": self.username,
             "email": self.email,
-            "buying_power": self.buying_power,
-            "total_net_worth": self.total_net_worth,
-            "bank_debt": self.bank_debt,
+            "buying_power": format_currency(self.buying_power),
+            "total_net_worth": format_currency(self.total_net_worth),
+            "bank_debt": format_currency(self.bank_debt),
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }

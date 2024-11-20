@@ -1,6 +1,7 @@
 from .db import db, environment, SCHEMA, add_prefix_for_prod
 from .base import HasTimestamps,BelongsToUser,BelongsToStock
 from typing import Any, Dict
+from ..utils.formatting_methods import format_currency
 
 class Transaction (HasTimestamps,BelongsToUser,BelongsToStock):
     __tablename__ = "transactions"
@@ -23,8 +24,8 @@ class Transaction (HasTimestamps,BelongsToUser,BelongsToStock):
             "id": self.id,
             "quantity":self.quantity,
             "stock_id": self.stock_id,
-            "transaction_price":self.transaction_price,
-            "total_price":self.total_price,
+            "transaction_price":format_currency(self.transaction_price),
+            "total_price":format_currency(self.total_price),
             "transaction_type":self.transaction_type,
             "transaction_date":self.created_at
         }

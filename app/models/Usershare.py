@@ -1,7 +1,7 @@
-from .db import db, SCHEMA, environment, add_prefix_for_prod
+from sqlalchemy import event
+from .db import db, SCHEMA, environment
 from sqlalchemy.sql import func
 from .base import BelongsToStock, BelongsToUser
-from .Stock import Stock
 from .Transaction import Transaction
 from ..utils.formatting_methods import format_currency
 
@@ -15,6 +15,7 @@ class Usershare(BelongsToStock, BelongsToUser):
 
     user = db.relationship("User", back_populates="shares")
     stock = db.relationship("Stock", back_populates="user_shares")
+    average_price = db.Column(db.Float, nullable=True)
 
     def calculate_average_price(self):
         transactions = Transaction.query.filter_by(
@@ -28,17 +29,25 @@ class Usershare(BelongsToStock, BelongsToUser):
 
         return total_cost / total_quantity if total_quantity > 0 else 0
 
+    def update_on_buy(self, quantity: float, price: float):
+        total_quantity = self.quantity + quantity
+        self.average_price = ((self.quantity * self.average_price) + (quantity * price)) / total_quantity
+        self.quantity = total_quantity
+
+    def update_on_sell(self, quantity: float):
+        self.quantity -= quantity
+    
+
     def to_dict(self):
         return {
-            # "user_id": self.user_id,
             "stock_id": self.stock_id,
             "quantity": self.quantity,
             "average_price": format_currency(self.calculate_average_price()),
         }
-    
+
     def to_dict_transaction(self):
         return {
-            "buying_power":self.user.buying_power,
+            "buying_power": format_currency(self.user.buying_power),
             "user_id": self.user_id,
             "stock_id": self.stock_id,
             "quantity": self.quantity,
