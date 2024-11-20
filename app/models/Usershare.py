@@ -1,36 +1,46 @@
 from .db import db, SCHEMA, environment, add_prefix_for_prod
 from sqlalchemy.sql import func
-from .base import BelongsToStock,BelongsToUser,HasTimestamps
-from .User import User
+from .base import BelongsToStock, BelongsToUser
 from .Stock import Stock
-from .types import ShareDict
+from .Transaction import Transaction
+from ..utils.formatting_methods import format_currency
 
-
-
-class Usershare(BelongsToStock,BelongsToUser,HasTimestamps):
+class Usershare(BelongsToStock, BelongsToUser):
     __tablename__ = "user_shares"
 
     if environment == "production":
         __table_args__ = {"schema": SCHEMA}
 
-    id = db.Column(db.Integer, primary_key=True)
     quantity = db.Column(db.Float, nullable=False)
-    average_price = db.Column(db.Float, nullable=False)
 
     user = db.relationship("User", back_populates="shares")
     stock = db.relationship("Stock", back_populates="user_shares")
 
+    def calculate_average_price(self):
+        transactions = Transaction.query.filter_by(
+            user_id=self.user_id,
+            stock_id=self.stock_id,
+            transaction_type="buy"
+        ).all()
 
-    def update_total_value(self):
-        self.total_value = self.quantity * self.average_price
+        total_cost = sum(t.transaction_price * t.quantity for t in transactions)
+        total_quantity = sum(t.quantity for t in transactions)
 
-    def to_dict(self) -> ShareDict:
+        return total_cost / total_quantity if total_quantity > 0 else 0
+
+    def to_dict(self):
         return {
-            "id": self.id,
+            # "user_id": self.user_id,
+            "stock_id": self.stock_id,
+            "quantity": self.quantity,
+            "average_price": format_currency(self.calculate_average_price()),
+        }
+    
+    def to_dict_transaction(self):
+        return {
+            "buying_power":self.user.buying_power,
             "user_id": self.user_id,
             "stock_id": self.stock_id,
             "quantity": self.quantity,
-            "average_price": self.average_price,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
+            "average_price": format_currency(self.calculate_average_price()),
         }

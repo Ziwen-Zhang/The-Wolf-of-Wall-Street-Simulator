@@ -11,7 +11,7 @@ class Transaction (HasTimestamps,BelongsToUser,BelongsToStock):
     quantity = db.Column(db.Integer, nullable=False)
     total_price = db.Column(db.Integer, nullable=False)
 
-    transaction_price = db.Column(db.Integer, nullable=False)
+    transaction_price = db.Column(db.Float, nullable=False)
     transaction_type = db.Column(db.String, nullable=False)
 
     def calculate_total_value(self):

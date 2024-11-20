@@ -3,7 +3,7 @@ from flask_login import login_required,current_user
 from app.models import User
 from app.models import db
 from typing import Any, Dict, List,Optional
-from ..models.types import UserDict
+from ..models.types import UserFullDict
 user_routes = Blueprint('users', __name__)
 
 
@@ -18,7 +18,7 @@ def users():
 
 @user_routes.route('/current')
 @login_required
-def user() -> UserDict:
+def user() -> UserFullDict:
     """
     Query for a user by id and returns that user in a dictionary
     """

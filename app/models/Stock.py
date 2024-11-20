@@ -2,11 +2,12 @@ from .db import db, environment, SCHEMA, add_prefix_for_prod
 from typing import Any, Dict
 from .base import Base
 
+
 class Stock(Base):
     __tablename__ = "stocks"
 
     if environment == "production":
-        __table_args__ = {'schema': SCHEMA}
+        __table_args__ = {"schema": SCHEMA}
 
     name = db.Column(db.String, nullable=False)
     symbol = db.Column(db.String, nullable=False)

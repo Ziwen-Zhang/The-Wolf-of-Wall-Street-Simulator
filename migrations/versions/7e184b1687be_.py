@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 88c3b225c826
+Revision ID: 7e184b1687be
 Revises: 
-Create Date: 2024-11-19 00:33:46.017980
+Create Date: 2024-11-19 22:50:39.286544
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '88c3b225c826'
+revision = '7e184b1687be'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -72,7 +72,7 @@ def upgrade():
     op.create_table('transactions',
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('total_price', sa.Integer(), nullable=False),
-    sa.Column('transaction_price', sa.Integer(), nullable=False),
+    sa.Column('transaction_price', sa.Float(), nullable=False),
     sa.Column('transaction_type', sa.String(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
@@ -84,13 +84,10 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user_shares',
-    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('quantity', sa.Float(), nullable=False),
-    sa.Column('average_price', sa.Float(), nullable=False),
     sa.Column('stock_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['stock_id'], ['stocks.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
