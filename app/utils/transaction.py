@@ -1,4 +1,4 @@
-from app.models import Usershare, Transaction, db, User, Stock
+from app.models import Usershare, Transaction, db, User, Stock , Order
 
 # def process_transaction(user_id, stock_id, quantity, price, transaction_type):
 def process_transaction(user_id, stock_id, quantity, transaction_type):
@@ -41,29 +41,56 @@ def process_transaction(user_id, stock_id, quantity, transaction_type):
     print(f"[Transaction] {transaction_type.upper()} | User {user_id} | Stock {stock_id} | Quantity {quantity} | Price {stock.price}")
     return usershare
 
+# def schedule_transaction(user_id, stock_id, quantity, limit_price, transaction_type):
+#     existing_transaction = Transaction.query.filter_by(
+#         user_id=user_id,
+#         stock_id=stock_id,
+#         transaction_type=transaction_type,
+#         limit_price=limit_price,
+#     ).first()
+#     if existing_transaction:
+#         existing_transaction.quantity += quantity
+#         existing_transaction.total_price += quantity * limit_price
+#         db.session.commit()
+#         print(f"[Schedule] Updated existing transaction: {existing_transaction}")
+#         return existing_transaction
+#     new_transaction = Transaction(
+#         quantity=quantity,
+#         limit_price=limit_price,
+#         transaction_type=transaction_type,
+#         transaction_price=limit_price,
+#         total_price=limit_price * quantity,
+#         user_id=user_id,
+#         stock_id=stock_id,
+#     )
+#     db.session.add(new_transaction)
+#     db.session.commit()
+#     print(f"[Schedule] Created new transaction: {new_transaction}")
+#     return new_transaction
+
 def schedule_transaction(user_id, stock_id, quantity, limit_price, transaction_type):
-    existing_transaction = Transaction.query.filter_by(
+    existing_order = Order.query.filter_by(
         user_id=user_id,
         stock_id=stock_id,
-        transaction_type=transaction_type,
+        order_type=transaction_type,
         limit_price=limit_price,
+        status="pending"
     ).first()
-    if existing_transaction:
-        existing_transaction.quantity += quantity
-        existing_transaction.total_price += quantity * limit_price
+
+    if existing_order:
+        existing_order.quantity += quantity
         db.session.commit()
-        print(f"[Schedule] Updated existing transaction: {existing_transaction}")
-        return existing_transaction
-    new_transaction = Transaction(
+        print(f"[Schedule] Updated existing order: {existing_order}")
+        return existing_order
+    new_order = Order(
+        user_id=user_id,
+        stock_id=stock_id,
         quantity=quantity,
         limit_price=limit_price,
-        transaction_type=transaction_type,
-        transaction_price=limit_price,
-        total_price=limit_price * quantity,
-        user_id=user_id,
-        stock_id=stock_id,
+        order_type=transaction_type,
+        status="pending",
     )
-    db.session.add(new_transaction)
+    db.session.add(new_order)
     db.session.commit()
-    print(f"[Schedule] Created new transaction: {new_transaction}")
-    return new_transaction
+    print(f"[Schedule] Created new order: {new_order}")
+    return new_order

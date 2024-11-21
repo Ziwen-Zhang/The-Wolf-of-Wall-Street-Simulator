@@ -20,7 +20,8 @@ class User(HasTimestamps, UserMixin):
     bank_debt = db.Column(db.Integer, default=0, nullable=False)
     shares = db.relationship("Usershare", back_populates="user", cascade="all, delete-orphan")
     base_buying_power = db.Column(db.Float, default=100000.0, nullable=False)
-
+    orders = db.relationship("Order", back_populates="user", cascade="all, delete-orphan")
+    
     @property
     def total_net_worth(self):
         total_shares_value = sum(

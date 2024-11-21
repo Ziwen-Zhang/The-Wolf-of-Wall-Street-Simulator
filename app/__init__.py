@@ -4,7 +4,7 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 from flask_login import LoginManager
-from .models import db, User,Stock
+from .models import db, User,Stock,Order
 from .api.user_routes import user_routes
 from .api.auth_routes import auth_routes
 from .api.stock_routes import stocks_routes
@@ -14,6 +14,7 @@ from .seeds import seed_commands
 from .config import Config
 from threading import Thread
 from .utils.simulate_transactions import simulate_transactions
+from .utils.trigger_limit_order import process_orders
 
 # from .sockets.stock_socket import socketio,stock_price_simulator
 from time import sleep
@@ -29,10 +30,10 @@ login.login_view = 'auth.unauthorized'
 
 
 # if __name__ == "app":
-#     transaction_thread = Thread(target=simulate_transactions)
-#     transaction_thread.daemon = True
-#     transaction_thread.start()
-#     app.run(debug=True)
+    # transaction_thread = Thread(target=simulate_transactions)
+    # transaction_thread.daemon = True
+    # transaction_thread.start()
+    # app.run(debug=True)
 
 
 
@@ -97,6 +98,8 @@ def handle_disconnect():
 price_thread = Thread(target=stock_price_simulator, daemon=True)
 # price_thread.start()
 
+order_thread = Thread(target=process_orders, daemon=True)
+order_thread.start()
 
 #websocket
 

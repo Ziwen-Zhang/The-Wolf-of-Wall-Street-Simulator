@@ -7,6 +7,9 @@ from typing import Any, Dict
 class Save(HasTimestamps, BelongsToUser, BelongsToStock):
     __tablename__ = "saves"
 
+    if environment == "production":
+        __table_args__ = {"schema": SCHEMA}
+        
     target_price = db.Column(db.Float, nullable=False)
     alert_type = db.Column(db.String, nullable=False)
 

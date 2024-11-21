@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 5db5d589c392
+Revision ID: 73071c7c2e14
 Revises: 
-Create Date: 2024-11-20 19:32:28.627829
+Create Date: 2024-11-20 21:13:20.585932
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5db5d589c392'
+revision = '73071c7c2e14'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -59,6 +59,20 @@ def upgrade():
     sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('orders',
+    sa.Column('order_type', sa.String(), nullable=False),
+    sa.Column('quantity', sa.Float(), nullable=False),
+    sa.Column('limit_price', sa.Float(), nullable=False),
+    sa.Column('status', sa.String(), nullable=False),
+    sa.Column('stock_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['stock_id'], ['stocks.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('saves',
     sa.Column('target_price', sa.Float(), nullable=False),
     sa.Column('alert_type', sa.String(), nullable=False),
@@ -104,6 +118,7 @@ def downgrade():
     op.drop_table('user_shares')
     op.drop_table('transactions')
     op.drop_table('saves')
+    op.drop_table('orders')
     op.drop_table('stocks')
     op.drop_table('leaderboard')
     op.drop_table('users')
