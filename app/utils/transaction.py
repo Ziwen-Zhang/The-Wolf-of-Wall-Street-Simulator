@@ -41,32 +41,6 @@ def process_transaction(user_id, stock_id, quantity, transaction_type):
     print(f"[Transaction] {transaction_type.upper()} | User {user_id} | Stock {stock_id} | Quantity {quantity} | Price {stock.price}")
     return usershare
 
-# def schedule_transaction(user_id, stock_id, quantity, limit_price, transaction_type):
-#     existing_transaction = Transaction.query.filter_by(
-#         user_id=user_id,
-#         stock_id=stock_id,
-#         transaction_type=transaction_type,
-#         limit_price=limit_price,
-#     ).first()
-#     if existing_transaction:
-#         existing_transaction.quantity += quantity
-#         existing_transaction.total_price += quantity * limit_price
-#         db.session.commit()
-#         print(f"[Schedule] Updated existing transaction: {existing_transaction}")
-#         return existing_transaction
-#     new_transaction = Transaction(
-#         quantity=quantity,
-#         limit_price=limit_price,
-#         transaction_type=transaction_type,
-#         transaction_price=limit_price,
-#         total_price=limit_price * quantity,
-#         user_id=user_id,
-#         stock_id=stock_id,
-#     )
-#     db.session.add(new_transaction)
-#     db.session.commit()
-#     print(f"[Schedule] Created new transaction: {new_transaction}")
-#     return new_transaction
 
 def schedule_transaction(user_id, stock_id, quantity, limit_price, transaction_type):
     existing_order = Order.query.filter_by(

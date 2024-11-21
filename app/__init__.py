@@ -58,17 +58,17 @@ def handle_disconnect():
     print("Client disconnected")
 
 
-price_thread = Thread(target=stock_price_simulator, args=(socketio,), daemon=True)
-price_thread.start()
+random_price_thread = Thread(target=stock_price_simulator, args=(socketio,), daemon=True)
+random_price_thread.start()
 
-order_thread = Thread(target=process_orders, daemon=True)
-order_thread.start()
+limit_order_thread = Thread(target=process_orders, daemon=True)
+limit_order_thread.start()
 
-transaction_thread = Thread(target=simulate_transactions, daemon=True)
-transaction_thread.start()
+random_transaction_thread = Thread(target=simulate_transactions, daemon=True)
+random_transaction_thread.start()
 
-save_thread = Thread(target=process_save_notifications, args=(socketio,), daemon=True)
-save_thread.start()
+save_notification_thread = Thread(target=process_save_notifications, args=(socketio,), daemon=True)
+save_notification_thread.start()
 
 
 # Since we are deploying with Docker and Flask,

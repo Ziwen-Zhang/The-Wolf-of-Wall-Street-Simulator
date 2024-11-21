@@ -25,7 +25,7 @@ class User(HasTimestamps, UserMixin):
     @property
     def total_net_worth(self):
         total_shares_value = sum(
-            share.quantity * (share.average_price or 0) 
+            share.quantity * share.stock.price
             for share in self.shares
         )
         return self.base_buying_power + total_shares_value

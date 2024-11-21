@@ -13,7 +13,7 @@ def process_orders():
                     (order.order_type == "buy" and stock.price <= order.limit_price) or
                     (order.order_type == "sell" and stock.price >= order.limit_price)
                 ):
-                    # 创建交易
+
                     new_transaction = Transaction(
                         user_id=order.user_id,
                         stock_id=order.stock_id,
@@ -24,7 +24,7 @@ def process_orders():
                     )
                     db.session.add(new_transaction)
 
-                    # 更新用户股票持仓或余额
+
                     user_share = Usershare.query.filter_by(
                         user_id=order.user_id,
                         stock_id=order.stock_id
@@ -43,6 +43,6 @@ def process_orders():
 
             db.session.commit()
 
-            time.sleep(5)  # 每 5 秒检查一次挂单
+            time.sleep(5)
 
 
