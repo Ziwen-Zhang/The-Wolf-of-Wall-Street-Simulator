@@ -21,14 +21,23 @@ class User(HasTimestamps, UserMixin):
     shares = db.relationship("Usershare", back_populates="user", cascade="all, delete-orphan")
     base_buying_power = db.Column(db.Float, default=100000.0, nullable=False)
     orders = db.relationship("Order", back_populates="user", cascade="all, delete-orphan")
+    total_net_worth = db.Column(db.Float, default=100000.0, nullable=False)
     
-    @property
-    def total_net_worth(self):
+    # @property
+    # def total_net_worth(self):
+    #     total_shares_value = sum(
+    #         share.quantity * share.stock.price
+    #         for share in self.shares
+    #     )
+    #     return self.base_buying_power + total_shares_value
+
+    def update_total_net_worth(self):
         total_shares_value = sum(
             share.quantity * share.stock.price
-            for share in self.shares
+            for share in self.shares if share.stock is not None
         )
-        return self.base_buying_power + total_shares_value
+        self.total_net_worth = self.base_buying_power + total_shares_value
+
 
     @property
     def buying_power(self) -> float:
@@ -68,3 +77,9 @@ class User(HasTimestamps, UserMixin):
         if include_shares:
             user_data["shares"] = [share.to_dict() for share in self.shares]
         return user_data
+
+    def to_dict_leader(self):
+        return {
+            "id":self.id,
+            "net_worth":format_currency(self.total_net_worth)
+        }

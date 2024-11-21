@@ -5,6 +5,7 @@ from app.models import db
 from typing import Any, Dict, List,Optional
 from ..models.types import UserFullDict
 from ..utils.formatting_methods import format_currency
+from sqlalchemy import desc
 
 user_routes = Blueprint('users', __name__)
 
@@ -20,11 +21,14 @@ def users():
 
 @user_routes.route('/current')
 @login_required
-def user() -> UserFullDict:
-    """
-    Query for a user by id and returns that user in a dictionary
-    """
+def get_current_user() -> UserFullDict:
     user:Optional[User] = User.query.get(current_user.id)
+    return user.to_dict()
+
+@user_routes.route('/<int:user_id>')
+@login_required
+def get_user_by_id(user_id):
+    user=User.query.get(user_id)
     return user.to_dict()
 
 @user_routes.route('/add', methods=['POST'])
@@ -73,5 +77,10 @@ def repay_loan():
         "user": user.to_dict()
     }), 200
 
-    
-    
+
+@user_routes.route("/leaderboard", methods=["GET"])
+def get_leaderboard():
+    users = User.query.order_by(desc(User.total_net_worth)).all()
+    user_list = [u.to_dict_leader() for u in users]
+
+    return jsonify({"users": user_list}), 200

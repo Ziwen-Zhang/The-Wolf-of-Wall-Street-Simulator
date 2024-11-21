@@ -30,13 +30,14 @@ def process_transaction(user_id, stock_id, quantity, transaction_type):
             usershare.update_on_buy(quantity, stock.price)
         stock.remaining_shares -= quantity
         user.update_buying_power(-stock.price * quantity)
-
+        user.update_total_net_worth()
     elif transaction_type == "sell":
         if not usershare or usershare.quantity < quantity:
             raise ValueError(f"Not enough shares to sell. Available: {usershare.quantity if usershare else 0}")
         usershare.update_on_sell(quantity)
         stock.remaining_shares += quantity
         user.update_buying_power(stock.price * quantity)
+        user.update_total_net_worth()
     db.session.commit()
     print(f"[Transaction] {transaction_type.upper()} | User {user_id} | Stock {stock_id} | Quantity {quantity} | Price {stock.price}")
     return usershare
