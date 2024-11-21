@@ -44,6 +44,37 @@ def add_save():
     return jsonify({"message": "Alert saved successfully", "save": new_save.to_dict()}), 201
 
 
+@save_routes.route("/", methods=["PUT"])
+@login_required
+def edit_save():
+    data = request.get_json()
+    stock_id = data.get("stock_id")
+    target_price = data.get("target_price")
+    alert_type = data.get("alert_type")
+
+    if not stock_id:
+        return jsonify({"error": "Stock ID is required"}), 400
+    if target_price is not None and target_price <= 0:
+        return jsonify({"error": "Invalid target price"}), 400
+    if alert_type is not None and alert_type not in ["above", "below"]:
+        return jsonify({"error": "Invalid alert type"}), 400
+
+    save = Save.query.filter_by(stock_id=stock_id, user_id=current_user.id).first()
+    if not save:
+        return jsonify({"error": "Save not found"}), 404
+
+    if save.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized"}), 403
+    if target_price is not None:
+        save.target_price = target_price
+    if alert_type is not None:
+        save.alert_type = alert_type
+
+    db.session.commit()
+
+    return jsonify({"message": "Save updated successfully", "save": save.to_dict()}), 200
+
+
 @save_routes.route("/", methods=["DELETE"])
 @login_required
 def delete_save():

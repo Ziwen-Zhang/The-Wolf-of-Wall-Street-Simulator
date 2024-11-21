@@ -106,6 +106,51 @@ def schedule_order():
         {"message": "Order scheduled successfully", "order": order.to_dict()}
     ), 201
 
+@transactions_routes.route("/schedule/<int:order_id>", methods=["PUT"])
+@login_required
+def edit_scheduled_order(order_id):
+    data = request.get_json()
+    quantity = data.get("quantity")
+    limit_price = data.get("limit_price")
+    order_type = data.get("order_type")
+
+    if not any([quantity, limit_price, order_type]):
+        return jsonify({"error": "Invalid request. At least one field is required."}), 400
+
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({"error": "Order not found."}), 404
+
+    if order.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized access."}), 403
+
+    if quantity:
+        order.quantity = quantity
+    if limit_price:
+        order.limit_price = limit_price
+    if order_type:
+        order.transaction_type = order_type
+
+    db.session.commit()
+
+    return jsonify({"message": "Order updated successfully", "order": order.to_dict()}), 200
+
+@transactions_routes.route("/schedule/<int:order_id>", methods=["DELETE"])
+@login_required
+def delete_scheduled_order(order_id):
+
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({"error": "Order not found."}), 404
+
+    if order.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized access."}), 403
+
+    db.session.delete(order)
+    db.session.commit()
+
+    return jsonify({"message": "Order deleted successfully"}), 200
+
 
 @transactions_routes.route("/orders", methods=["GET"])
 @login_required
