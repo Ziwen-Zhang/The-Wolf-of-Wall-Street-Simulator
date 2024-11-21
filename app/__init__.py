@@ -19,7 +19,6 @@ from .sockets.stock_price_simulator import stock_price_simulator
 from .sockets.trigger_limit_order import process_orders
 from flask_socketio import SocketIO, emit
 
-
 app = Flask(__name__, static_folder="../react-vite/dist", static_url_path="/")
 app.json.sort_keys = False
 # Setup login manager
@@ -58,17 +57,17 @@ def handle_disconnect():
     print("Client disconnected")
 
 
-random_price_thread = Thread(target=stock_price_simulator, args=(socketio,), daemon=True)
-random_price_thread.start()
+# random_price_thread = Thread(target=stock_price_simulator, args=(socketio,), daemon=True)
+# random_price_thread.start()
 
-limit_order_thread = Thread(target=process_orders, daemon=True)
-limit_order_thread.start()
+# limit_order_thread = Thread(target=process_orders, daemon=True)
+# limit_order_thread.start()
 
-random_transaction_thread = Thread(target=simulate_transactions, daemon=True)
-random_transaction_thread.start()
+# random_transaction_thread = Thread(target=simulate_transactions, daemon=True)
+# random_transaction_thread.start()
 
-save_notification_thread = Thread(target=process_save_notifications, args=(socketio,), daemon=True)
-save_notification_thread.start()
+# save_notification_thread = Thread(target=process_save_notifications, args=(socketio,), daemon=True)
+# save_notification_thread.start()
 
 
 # Since we are deploying with Docker and Flask,

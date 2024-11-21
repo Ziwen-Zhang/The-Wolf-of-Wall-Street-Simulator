@@ -47,9 +47,11 @@ def process_transaction(user_id, stock_id, quantity, transaction_type):
         stock.remaining_shares += quantity
         user.update_buying_power(stock.price * quantity)
         user.update_total_net_worth()
+        if usershare.quantity == 0:
+            db.session.delete(usershare)
     db.session.commit()
     print(
-        f"[Transaction] {transaction_type.upper()} | User {user_id} | Stock {stock_id} | Quantity {quantity} | Price {stock.price}"
+        f"[Transaction] {transaction_type.upper()} | User {user_id} | Stock {stock_id} | Quantity {quantity} | Price {stock.price} | Total {stock.price * quantity}"
     )
     return usershare
 

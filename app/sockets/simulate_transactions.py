@@ -8,7 +8,7 @@ def generate_random_buy_transaction():
     from app import db, app
 
     with app.app_context():
-        user_id = random.randint(1, 100)
+        user_id = random.randint(2, 100)
         stock_id = random.randint(1, 21)
         quantity = random.randint(1, 10)
         stock = Stock.query.get(stock_id)

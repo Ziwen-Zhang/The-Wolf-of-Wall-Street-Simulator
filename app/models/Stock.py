@@ -2,6 +2,9 @@ from .db import db, environment, SCHEMA, add_prefix_for_prod
 from typing import Any, Dict
 from .base import Base
 from ..utils.formatting_methods import format_currency
+from sqlalchemy.orm import Session
+from sqlalchemy.event import listens_for
+
 
 class Stock(Base):
     __tablename__ = "stocks"
