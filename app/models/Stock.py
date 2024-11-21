@@ -1,7 +1,7 @@
 from .db import db, environment, SCHEMA, add_prefix_for_prod
 from typing import Any, Dict
 from .base import Base
-
+from ..utils.formatting_methods import format_currency
 
 class Stock(Base):
     __tablename__ = "stocks"
@@ -40,6 +40,6 @@ class Stock(Base):
             "price": self.price,
             "total_shares": self.total_shares,
             "remaining_shares": self.remaining_shares,
-            "total_value": self.total_value,
+            "total_value": format_currency(self.total_value),
             "tag": self.tag.to_dict() if self.tag else None,
         }
