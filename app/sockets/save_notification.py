@@ -3,9 +3,6 @@ from app.models import Save, Stock
 from flask_socketio import emit
 
 def process_save_notifications(socketio):
-    """
-    Periodically checks for saved stocks and sends notifications via WebSocket.
-    """
     from app import app ,db
     while True:
         try:
