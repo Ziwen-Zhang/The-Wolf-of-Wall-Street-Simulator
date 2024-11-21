@@ -9,9 +9,6 @@ def process_orders():
 
             for order in pending_orders:
                 stock = Stock.query.get(order.stock_id)
-                if not stock:
-                    continue
-
                 if (
                     (order.order_type == "buy" and stock.price <= order.limit_price) or
                     (order.order_type == "sell" and stock.price >= order.limit_price)
@@ -21,8 +18,8 @@ def process_orders():
                         user_id=order.user_id,
                         stock_id=order.stock_id,
                         quantity=order.quantity,
-                        transaction_price=order.limit_price,
-                        total_price=order.limit_price * order.quantity,
+                        transaction_price=stock.price,
+                        total_price=stock.price * order.quantity,
                         transaction_type=order.order_type,
                     )
                     db.session.add(new_transaction)
@@ -34,17 +31,18 @@ def process_orders():
                     ).first()
 
                     if order.order_type == "buy":
-                        user_share.update_on_buy(order.quantity, order.limit_price)
-                        order.user.update_buying_power(-order.limit_price * order.quantity)
+                        user_share.update_on_buy(order.quantity, stock.price)
+                        order.user.update_buying_power(-stock.price * order.quantity)
                     elif order.order_type == "sell":
                         user_share.update_on_sell(order.quantity)
-                        order.user.update_buying_power(order.limit_price * order.quantity)
+                        order.user.update_buying_power(stock.price * order.quantity)
 
-                    # 标记订单为已执行
+
                     order.status = "executed"
                     db.session.add(order)
 
             db.session.commit()
 
             time.sleep(5)  # 每 5 秒检查一次挂单
+
 
