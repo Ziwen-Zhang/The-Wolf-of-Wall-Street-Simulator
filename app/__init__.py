@@ -4,7 +4,7 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 from flask_login import LoginManager
-from .models import db, User
+from .models import db, User,Stock
 from .api.user_routes import user_routes
 from .api.auth_routes import auth_routes
 from .api.stock_routes import stocks_routes
@@ -15,6 +15,12 @@ from .config import Config
 from threading import Thread
 from .utils.simulate_transactions import simulate_transactions
 
+# from .sockets.stock_socket import socketio,stock_price_simulator
+from time import sleep
+from flask_socketio import SocketIO, emit
+import random
+
+
 app = Flask(__name__, static_folder='../react-vite/dist', static_url_path='/')
 app.json.sort_keys = False
 # Setup login manager
@@ -24,7 +30,7 @@ login.login_view = 'auth.unauthorized'
 
 # if __name__ == "app":
 #     transaction_thread = Thread(target=simulate_transactions)
-#     transaction_thread.daemon = True  # 主线程退出时自动关闭
+#     transaction_thread.daemon = True
 #     transaction_thread.start()
 #     app.run(debug=True)
 
@@ -50,6 +56,51 @@ Migrate(app, db)
 
 # Application Security
 CORS(app)
+
+
+# websocket
+socketio = SocketIO(app, cors_allowed_origins="*")
+def stock_price_simulator():
+    while True:
+        try:
+            with app.app_context():
+                stocks = Stock.query.all()
+                updated_stocks = []
+
+                for stock in stocks:
+                    percentage_change = random.uniform(-0.05, 0.05)
+                    new_price = stock.price * (1 + percentage_change)
+                    stock.price = round(new_price, 2)
+                    db.session.add(stock)
+                    updated_stocks.append({
+                        "id": stock.id,
+                        "name": stock.name,
+                        "price": stock.price
+                    })
+
+                db.session.commit()
+
+                socketio.emit("stock_update", {"stocks": updated_stocks})
+                print("Updated stock prices sent to clients.")
+        except Exception as e:
+            print(f"Error in stock_price_simulator: {e}")
+        sleep(3)
+
+@socketio.on("connect")
+def handle_connect():
+    print("Client connected")
+
+@socketio.on("disconnect")
+def handle_disconnect():
+    print("Client disconnected")
+
+price_thread = Thread(target=stock_price_simulator, daemon=True)
+# price_thread.start()
+
+
+#websocket
+
+
 
 
 # Since we are deploying with Docker and Flask,

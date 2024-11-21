@@ -18,7 +18,7 @@ class Usershare(BelongsToStock, BelongsToUser):
 
     @property
     def total_value(self) -> float:
-        return self.quantity * self.average_price
+        return self.quantity * self.stock.price
 
     # def calculate_average_price(self):
     #     result = db.session.query(
@@ -38,10 +38,10 @@ class Usershare(BelongsToStock, BelongsToUser):
             self.average_price = 0.0
         total_quantity = self.quantity + quantity
         self.average_price = (
-            (self.quantity * self.average_price) + (quantity * price)
+            (self.quantity * self.average_price) + (quantity * price)   
         ) / total_quantity
         self.quantity = total_quantity
-
+        
     def update_on_sell(self, quantity: float):
         self.quantity -= quantity
 
@@ -50,6 +50,7 @@ class Usershare(BelongsToStock, BelongsToUser):
             "stock_id": self.stock_id,
             "quantity": self.quantity,
             "average_price": format_currency(self.average_price),
+            "current_price":format_currency(self.stock.price),
             "total_value": format_currency(self.total_value), 
         }
 
@@ -60,5 +61,6 @@ class Usershare(BelongsToStock, BelongsToUser):
             "stock_id": self.stock_id,
             "quantity": self.quantity,
             "average_price": format_currency(self.average_price),
+            "current_price":format_currency(self.stock.price),
             "total_value": format_currency(self.total_value), 
         }

@@ -20,9 +20,9 @@ def buy_stock():
     data = request.get_json()
     stock_id = data.get("stock_id")
     quantity = data.get("quantity")
-    price = data.get("price")
+    # price = data.get("price")
 
-    usershare = process_transaction(current_user.id, stock_id, quantity, price, "buy")
+    usershare = process_transaction(current_user.id, stock_id, quantity, "buy")
     return jsonify({"message": "Transaction success!", "shares": usershare.to_dict_transaction()})
 
 
@@ -33,9 +33,9 @@ def sell_stock():
     data = request.get_json()
     stock_id = data.get("stock_id")
     quantity = data.get("quantity")
-    price = data.get("price")
+    # price = data.get("price")
 
-    usershare = process_transaction(current_user.id, stock_id, quantity, price, "sell")
+    usershare = process_transaction(current_user.id, stock_id, quantity, "sell")
     return jsonify({"message": "Transaction success!", "shares": usershare.to_dict_transaction() if usershare.quantity > 0 else None})
 
 

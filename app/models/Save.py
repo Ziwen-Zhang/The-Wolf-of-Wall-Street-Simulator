@@ -7,16 +7,17 @@ from typing import Any, Dict
 class Save(HasTimestamps, BelongsToUser, BelongsToStock):
     __tablename__ = "saves"
 
-    __table_args__ = (
-        UniqueConstraint('user_id', 'stock_id', name='unique_user_stock'),
-        {'schema': SCHEMA} if environment == "production" else {}
-    )
+    target_price = db.Column(db.Float, nullable=False)
+    alert_type = db.Column(db.String, nullable=False)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
             "stock_id": self.stock_id,
+            "target_price": self.target_price,
+            "alert_type": self.alert_type,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
         }
+
