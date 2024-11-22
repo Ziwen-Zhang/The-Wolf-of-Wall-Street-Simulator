@@ -4,6 +4,8 @@ import SignupFormPage from '../components/SignupFormPage';
 import Layout from './Layout';
 import StockDetailPage from '../components/StockPage/StockDetailPage';
 import StockSideBar from '../components/HomePage/StockSideBar'
+
+
 export const router = createBrowserRouter([
   {
     element: <Layout />,

@@ -40,9 +40,17 @@ def stock_price_simulator(socketio):
                     new_price = stock.price * (1 + percentage_change)
                     stock.price = round(new_price, 2)
                     db.session.add(stock)
-                    updated_stocks.append(
-                        {"id": stock.id, "name": stock.name, "price": stock.price}
-                    )
+
+                    stock_data = {
+                        "id": stock.id,
+                        "name": stock.name,
+                        "price": stock.price,
+                        "description":stock.description,
+                        "symbol":stock.symbol
+                    }
+                    updated_stocks.append(stock_data)
+                    socketio.emit("stock_update", stock_data, room=str(stock.id))
+
                 affected_users = (
                     db.session.query(User)
                     .join(Usershare, Usershare.user_id == User.id)

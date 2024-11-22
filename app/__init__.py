@@ -17,7 +17,7 @@ from .sockets.simulate_transactions import simulate_transactions
 from .sockets.save_notification import process_save_notifications
 from .sockets.stock_price_simulator import stock_price_simulator
 from .sockets.trigger_limit_order import process_orders
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room, leave_room
 
 app = Flask(__name__, static_folder="../react-app/dist", static_url_path="/")
 app.json.sort_keys = False
@@ -56,9 +56,18 @@ def handle_connect():
 def handle_disconnect():
     print("Client disconnected")
 
+@socketio.on("join_stock_room")
+def handle_join_stock_room(stock_id):
+    join_room(stock_id)
+    print(f"Client joined room for stock {stock_id}")
 
-# random_price_thread = Thread(target=stock_price_simulator, args=(socketio,), daemon=True)
-# random_price_thread.start()
+@socketio.on("leave_stock_room")
+def handle_leave_stock_room(stock_id):
+    leave_room(stock_id)
+    print(f"Client left room for stock {stock_id}")
+
+random_price_thread = Thread(target=stock_price_simulator, args=(socketio,), daemon=True)
+random_price_thread.start()
 
 # limit_order_thread = Thread(target=process_orders, daemon=True)
 # limit_order_thread.start()
