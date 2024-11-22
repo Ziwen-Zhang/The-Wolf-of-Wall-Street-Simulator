@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FaUserCircle } from 'react-icons/fa';
+import { FaUserCircle } from "react-icons/fa";
 import { thunkLogout } from "../../redux/session";
 import OpenModalMenuItem from "./OpenModalMenuItem";
 import LoginFormModal from "../LoginFormModal";
@@ -40,37 +40,59 @@ function ProfileButton() {
   };
 
   return (
-    <>
-      <button onClick={toggleMenu}>
-        <FaUserCircle />
+    <div className="relative inline-block text-left">
+      {/* Profile Icon */}
+      <button
+        onClick={toggleMenu}
+        className="p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+      >
+        <FaUserCircle className="w-8 h-8" />
       </button>
+
+      {/* Dropdown Menu */}
       {showMenu && (
-        <ul className={"profile-dropdown"} ref={ulRef}>
+        <ul
+          ref={ulRef}
+          className="absolute right-0 mt-2 min-w-[80px] bg-gray-800 rounded-md shadow-lg"
+        >
           {user ? (
             <>
-              <li>{user.username}</li>
-              <li>{user.email}</li>
+              <button className="px-4 py-2 text-center text-green-400 hover:text-yellow-300">
+                {user.first_name}
+              </button>
+              {/* <li className="px-4 py-2 text-green-400 hover:text-yellow-300">
+                {user.email}
+              </li> */}
               <li>
-                <button onClick={logout}>Log Out</button>
+                <button
+                  onClick={logout}
+                  className="w-full py-2 text-center text-green-400 hover:text-yellow-300 focus:outline-none"
+                >
+                  Log Out
+                </button>
               </li>
             </>
           ) : (
-            <>
-              <OpenModalMenuItem
-                itemText="Log In"
-                onItemClick={closeMenu}
-                modalComponent={<LoginFormModal />}
-              />
-              <OpenModalMenuItem
-                itemText="Sign Up"
-                onItemClick={closeMenu}
-                modalComponent={<SignupFormModal />}
-              />
-            </>
+            <div className="flex flex-col gap-2 py-2">
+              <button className="w-full text-green-400 hover:text-yellow-300 text-center">
+                <OpenModalMenuItem
+                  itemText="Log In"
+                  onItemClick={closeMenu}
+                  modalComponent={<LoginFormModal />}
+                />
+              </button>
+              <button className="w-full text-green-400 hover:text-yellow-300 text-center">
+                <OpenModalMenuItem
+                  itemText="Sign Up"
+                  onItemClick={closeMenu}
+                  modalComponent={<SignupFormModal />}
+                />
+              </button>
+            </div>
           )}
         </ul>
       )}
-    </>
+    </div>
   );
 }
 

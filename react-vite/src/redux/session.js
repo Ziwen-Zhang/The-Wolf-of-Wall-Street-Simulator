@@ -41,12 +41,14 @@ export const thunkLogin = (credentials) => async dispatch => {
 };
 
 export const thunkSignup = (user) => async (dispatch) => {
+  console.log(user)
   const response = await fetch("/api/auth/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(user)
+  
   });
-
+  console.log(response)
   if(response.ok) {
     const data = await response.json();
     dispatch(setUser(data));
@@ -59,7 +61,9 @@ export const thunkSignup = (user) => async (dispatch) => {
 };
 
 export const thunkLogout = () => async (dispatch) => {
-  await fetch("/api/auth/logout");
+  await fetch("/api/auth/", {
+    method: 'DELETE',
+  });
   dispatch(removeUser());
 };
 
