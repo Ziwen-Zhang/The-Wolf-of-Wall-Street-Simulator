@@ -1,6 +1,6 @@
 # app/seeds/seed_saves.py
 from app.models import db, Save, environment, SCHEMA
-from sqlalchemy.sql import text
+from sqlalchemy import text
 
 def seed_saves():
     saves = [
@@ -20,10 +20,10 @@ def seed_saves():
     db.session.commit()
     print("Seeded saves.")
 
-def undo_users():
+def undo_saves():
     if environment == "production":
-        db.session.execute(text(f'TRUNCATE table "{SCHEMA}".users RESTART IDENTITY CASCADE;'))
+        db.session.execute(text(f'TRUNCATE table "{SCHEMA}".saves RESTART IDENTITY CASCADE;'))
     else:
-        db.session.execute(text("DELETE FROM users"))
+        db.session.execute(text("DELETE FROM saves"))
     db.session.commit()
-    print("Undid users.")
+    print("Undid saves.")
