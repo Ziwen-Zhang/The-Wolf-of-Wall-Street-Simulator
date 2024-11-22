@@ -54,3 +54,4 @@ python-socketio==5.8.0
 dnspython==2.2.1
 gevent==22.10.2
 gevent-websocket==0.10.1
+eventlet==0.33.3
