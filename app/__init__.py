@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect,send_from_directory
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect, generate_csrf
@@ -19,7 +19,7 @@ from .sockets.stock_price_simulator import stock_price_simulator
 from .sockets.trigger_limit_order import process_orders
 from flask_socketio import SocketIO, emit
 
-app = Flask(__name__, static_folder="../react-vite/dist", static_url_path="/")
+app = Flask(__name__, static_folder="../react-app/dist", static_url_path="/")
 app.json.sort_keys = False
 # Setup login manager
 login = LoginManager(app)
