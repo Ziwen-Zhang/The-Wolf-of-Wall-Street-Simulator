@@ -20,10 +20,10 @@ def seed_saves():
     db.session.commit()
     print("Seeded saves.")
 
-def undo_saves():
+def undo_users():
     if environment == "production":
-        db.session.execute(f"TRUNCATE table {SCHEMA}.saves RESTART IDENTITY CASCADE;")
+        db.session.execute(text(f'TRUNCATE table "{SCHEMA}".users RESTART IDENTITY CASCADE;'))
     else:
-        db.session.execute(text("DELETE FROM saves"))
+        db.session.execute(text("DELETE FROM users"))
     db.session.commit()
-    print("Undid saves.")
+    print("Undid users.")
