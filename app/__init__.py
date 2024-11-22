@@ -46,7 +46,7 @@ Migrate(app, db)
 CORS(app)
 
 # websocket
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
 @socketio.on("connect")
 def handle_connect():
