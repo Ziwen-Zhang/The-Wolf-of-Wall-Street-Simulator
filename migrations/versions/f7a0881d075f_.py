@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 import os
 environment = os.getenv("FLASK_ENV")
-SCHEMA = os.environ.get("SCHEMA", "public")
+SCHEMA = 'wolfOfWallStreetSimulator' if os.getenv("FLASK_ENV") == "production" else None
 
 # revision identifiers, used by Alembic.
 revision = 'f7a0881d075f'
