@@ -27,7 +27,6 @@ def get_current_user() -> UserFullDict:
 
 
 @user_routes.route("/<int:user_id>")
-@login_required
 def get_user_by_id(user_id):
     user = User.query.get(user_id)
     return user.to_dict()
