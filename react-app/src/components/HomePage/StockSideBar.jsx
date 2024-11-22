@@ -8,6 +8,7 @@ function StockSideBar() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // const socket = io("http://localhost:8000");
     const socket = io("https://the-wolf-of-wall-street-simulator.onrender.com");
     socket.on("stock_update", (data) => {
       setStocks(data.stocks);

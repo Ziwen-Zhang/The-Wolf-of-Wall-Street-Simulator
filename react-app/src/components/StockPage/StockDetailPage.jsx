@@ -33,6 +33,7 @@ function StockDetailPage() {
   const [stockData, setStockData] = useState(null);
 
   useEffect(() => {
+    // const socket = io("http://localhost:8000");
     const socket = io("https://the-wolf-of-wall-street-simulator.onrender.com");
 
     socket.on("stock_update", (updatedStocks) => {
