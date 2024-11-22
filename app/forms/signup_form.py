@@ -9,7 +9,7 @@ def user_exists(form, field):
     email = field.data
     user = User.query.filter(User.email == email).first()
     if user:
-        raise ValidationError('Email address is already in use.')
+        raise ValidationError("Email address is already in use.")
 
 
 def username_exists(form, field):
@@ -17,20 +17,23 @@ def username_exists(form, field):
     username = field.data
     user = User.query.filter(User.username == username).first()
     if user:
-        raise ValidationError('Username is already in use.')
+        raise ValidationError("Username is already in use.")
+
 
 def same_password(form, field):
     confirm_password = field.data
     password = form.password.data
     print(password)
     if confirm_password != password:
-        raise ValidationError('passwords must match')
+        raise ValidationError("passwords must match")
+
 
 class SignUpForm(FlaskForm):
-    username = StringField(
-        'username', validators=[DataRequired(), username_exists])
-    email = StringField('email', validators=[DataRequired(), user_exists])
-    password = StringField('password', validators=[DataRequired()])
-    first_name = StringField('first_name', validators=[DataRequired()])
-    last_name = StringField('last_name', validators=[DataRequired()])
-    confirm_password = StringField('confirm_password', validators=[DataRequired(),same_password])
+    username = StringField("username", validators=[DataRequired(), username_exists])
+    email = StringField("email", validators=[DataRequired(), user_exists])
+    password = StringField("password", validators=[DataRequired()])
+    first_name = StringField("first_name", validators=[DataRequired()])
+    last_name = StringField("last_name", validators=[DataRequired()])
+    confirm_password = StringField(
+        "confirm_password", validators=[DataRequired(), same_password]
+    )

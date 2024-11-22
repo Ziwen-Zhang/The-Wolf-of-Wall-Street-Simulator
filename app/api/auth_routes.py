@@ -45,6 +45,7 @@ def logout():
 
 @auth_routes.route("/signup", methods=["POST"])
 def sign_up():
+    print("inroute")
     """
     Creates a new user and logs them in
     """
@@ -62,7 +63,7 @@ def sign_up():
         db.session.commit()
         login_user(user)
         return user.to_dict()
-    return form.errors, 401
+    return form.errors, 400
 
 
 @auth_routes.route("/unauthorized")
