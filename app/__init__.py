@@ -24,7 +24,6 @@ app.json.sort_keys = False
 # Setup login manager
 login = LoginManager(app)
 login.login_view = "auth.unauthorized"
-app.cli.add_command(seed_commands)
 
 @login.user_loader
 def load_user(id):
