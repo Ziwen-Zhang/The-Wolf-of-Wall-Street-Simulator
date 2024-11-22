@@ -10,7 +10,7 @@ from .api.auth_routes import auth_routes
 from .api.stock_routes import stocks_routes
 from .api.save_routes import save_routes
 from .api.transaction_routes import transactions_routes
-from .seeds import seed_commands, undo
+from .seeds import seed_commands
 from .config import Config
 from threading import Thread
 from .sockets.simulate_transactions import simulate_transactions
@@ -18,13 +18,13 @@ from .sockets.save_notification import process_save_notifications
 from .sockets.stock_price_simulator import stock_price_simulator
 from .sockets.trigger_limit_order import process_orders
 from flask_socketio import SocketIO, emit
-from .seeds.seed_funcs import seed_data,undo_data
 
 app = Flask(__name__, static_folder="../react-vite/dist", static_url_path="/")
 app.json.sort_keys = False
 # Setup login manager
 login = LoginManager(app)
 login.login_view = "auth.unauthorized"
+app.cli.add_command(seed_commands)
 
 @login.user_loader
 def load_user(id):
@@ -130,14 +130,3 @@ def react_root(path):
 @app.errorhandler(404)
 def not_found(e):
     return app.send_static_file("index.html")
-
-@app.cli.command("seed")
-def seed_all_command():
-    seed_data()
-    print("Database seeded")
-
-
-@app.cli.command("clear-seed")
-def clear_all_command():
-    undo_data()
-    print("Seed data removed from database")
