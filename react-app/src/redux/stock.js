@@ -1,3 +1,6 @@
+import { thunkGetShares } from "./ownedshares";
+import { thunkAuthenticate } from "./session";
+
 const SET_STOCK = "stock/setStock";
 const SET_STOCKS = "stock/setStocks";
 const SET_STOCK_RECORDS = "stock/setStockRecords";
@@ -43,7 +46,9 @@ export const thunkGetStocks = () => async (dispatch) => {
 
 export const startStockUpdates = () => (dispatch) => {
   dispatch(thunkGetStocks());
+  dispatch(thunkGetShares())
   const intervalId = setInterval(() => {
+    dispatch(thunkGetShares())
     dispatch(thunkGetStocks());
   }, 3000);
   return () => clearInterval(intervalId);

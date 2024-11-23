@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { startStockUpdates } from "../../redux/stock";
+import { setStockRecords, startStockUpdates } from "../../redux/stock";
+import { thunkBuyStock, thunkSellStock } from "../../redux/transaction";
 import { Line } from "react-chartjs-2";
 import { useParams } from "react-router-dom";
 import {
@@ -13,6 +14,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { thunkAuthenticate } from "../../redux/session";
+import ErrorModal from "../ErrorModal/ErrorModal";
 
 ChartJS.register(
   CategoryScale,
@@ -27,6 +30,7 @@ ChartJS.register(
 function StockDetailPage() {
   const { stockId } = useParams();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
   const stocks = useSelector((state) => state.stock.stocks);
   const allRecords = useSelector((state) => state.stock.allRecords);
   const stock = stocks.find((s) => s.id === Number(stockId));
@@ -34,24 +38,47 @@ function StockDetailPage() {
     priceHistory: [],
     timestamps: [],
   };
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const user = useSelector((state) => state.session.user);
+  const ownedShares = useSelector((state) => state.ownedShares.ownedShares);
+
+  const [quantity, setQuantity] = useState(1);
+  const [remainingAfterBuy, setRemainingAfterBuy] = useState(
+    user?.buying_power || 0
+  );
+  const [maxQuantity, setMaxQuantity] = useState(
+    Math.floor(user?.buying_power / stock?.price) || 0
+  );
+
+  useEffect(() => {
+    if (user && stock) {
+      setMaxQuantity(Math.floor(user.buying_power / stock.price));
+      setRemainingAfterBuy(user.buying_power - quantity * stock.price);
+    }
+  }, [user, stock, quantity]);
+
+  const handleQuantityChange = (e) => {
+    const inputValue = parseFloat(e.target.value);
+    if (inputValue > maxQuantity) {
+      setQuantity(maxQuantity);
+      setRemainingAfterBuy(user.buying_power - maxQuantity * stock.price);
+    } else {
+      setQuantity(inputValue || 0);
+      setRemainingAfterBuy(user.buying_power - inputValue * stock.price);
+    }
+  };
 
   useEffect(() => {
     const savedData = localStorage.getItem("stockHistoryData");
     if (savedData) {
       const parsedData = JSON.parse(savedData);
-      dispatch({
-        type: "stock/setStockRecords",
-        payload: { stocks: [], allRecords: parsedData },
-      });
+      dispatch(setStockRecords({ stocks: [], allRecords: parsedData }));
+      // Remove this line:
+      // setLoading(false)
     }
-
-    const cleanup = dispatch(startStockUpdates());
-
-    return () => {
-      cleanup && cleanup();
-    };
+    return dispatch(startStockUpdates());
   }, [dispatch]);
 
   useEffect(() => {
@@ -60,8 +87,15 @@ function StockDetailPage() {
     }
   }, [allRecords]);
 
-  if (!stock) {
-    return <div>Loading stock data...</div>;
+  // New useEffect to monitor data loading
+  useEffect(() => {
+    if (stocks.length > 0 && stockHistory.priceHistory.length > 0) {
+      setLoading(false);
+    }
+  }, [stocks, stockHistory]);
+
+  if (loading) {
+    return <div className="text-gray-500 text-center mt-4">Loading...</div>;
   }
 
   if (!stockHistory.priceHistory.length || !stockHistory.timestamps.length) {
@@ -116,6 +150,29 @@ function StockDetailPage() {
     },
   };
 
+  const handleBuy = () => {
+    if (!quantity || quantity <= 0) return;
+
+    if (remainingAfterBuy < 0) {
+      setErrorMessage("Insufficient buying power! Please adjust the quantity.");
+      setShowErrorModal(true);
+    } else {
+      dispatch(thunkBuyStock(stock.id, quantity));
+      dispatch(thunkAuthenticate());
+    }
+  };
+
+  const handleModalClose = () => {
+    setShowErrorModal(false);
+    setErrorMessage("");
+  };
+
+  const handleSell = () => {
+    if (!quantity || quantity <= 0) return;
+    dispatch(thunkSellStock(stock.id, quantity));
+    dispatch(thunkAuthenticate());
+  };
+
   return (
     <div className="p-8 h-screen bg-gray-800 text-gray-300 overflow-y-auto text-left scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-800 hover:scrollbar-thumb-gray-400">
       <h1 className="text-2xl font-bold mb-4 text-teal-400">
@@ -140,7 +197,8 @@ function StockDetailPage() {
         </div>
         <div className="flex">
           <div className="w-1/3 space-y-2 px-4">
-            <div className="space-y-5">
+            {/* Stats Section */}
+            <div className="space-y-8">
               <div className="flex justify-between">
                 <span className="font-bold text-teal-400">Initial Price:</span>{" "}
                 <span className="text-green-500">
@@ -191,45 +249,138 @@ function StockDetailPage() {
               </div>
             ) : (
               (() => {
-                const ownedShare = user.shares.find(
+                const ownedShare = ownedShares.find(
                   (share) => share.stock_id === stock.id
                 );
-                return ownedShare ? (
-                  <div className="text-gray-400 space-y-2">
-                    <div className="flex justify-between">
-                      <span className="font-bold text-teal-400">Quantity:</span>
-                      <span>{ownedShare.quantity.toFixed(2)}</span>
+                if (ownedShare) {
+                  const earnings =
+                    ownedShare.total_value -
+                    ownedShare.quantity * ownedShare.average_price;
+                  const earningsPercentage =
+                    (earnings /
+                      (ownedShare.quantity * ownedShare.average_price)) *
+                    100;
+                  const earningsColor =
+                    earnings >= 0 ? "text-green-500" : "text-red-500";
+
+                  return (
+                    <div className="text-gray-400 space-y-8">
+                      <div className="flex justify-between">
+                        <span className="font-bold text-teal-400">
+                          Quantity:
+                        </span>
+                        <span>{ownedShare.quantity.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-bold text-teal-400">
+                          Average Price:
+                        </span>
+                        <span>${ownedShare.average_price.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-bold text-teal-400">
+                          Total Value:
+                        </span>
+                        <span>${ownedShare.total_value.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-bold text-teal-400">
+                          Total Earnings:
+                        </span>
+                        <span className={`${earningsColor}`}>
+                          ${earnings.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-bold text-teal-400">
+                          Earnings Percentage:
+                        </span>
+                        <span className={`${earningsColor}`}>
+                          {earningsPercentage.toFixed(2)}%
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-bold text-teal-400">
-                        Average Price:
-                      </span>
-                      <span>${ownedShare.average_price.toFixed(2)}</span>
+                  );
+                } else {
+                  return (
+                    <div className="text-gray-500 text-center">
+                      You do not own any shares of this stock.
                     </div>
-                    <div className="flex justify-between">
-                      <span className="font-bold text-teal-400">
-                        Current Price:
-                      </span>
-                      <span>${ownedShare.current_price.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="font-bold text-teal-400">
-                        Total Value:
-                      </span>
-                      <span>${ownedShare.total_value.toFixed(2)}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-gray-500 text-center">
-                    You do not own any shares of this stock.
-                  </div>
-                );
+                  );
+                }
               })()
             )}
           </div>
-          <div className="w-1/3 space-y-2 px-4">
-          hello
-          </div>
+          {!user ? (
+            <div className="text-red-500 text-center">
+              You need to log in to view this section.
+            </div>
+          ) : (
+            <div className="w-1/3 space-y-4 px-4">
+              <div className="flex justify-between">
+                <span className="font-semibold text-teal-400">
+                  Buying Power
+                </span>
+                <span className="text-green-500">
+                  ${user.buying_power.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold text-teal-400">Cost</span>
+                <span className="text-red-400">
+                  - ${(quantity * stock.price).toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold text-teal-400">Remaining</span>
+                <span
+                  className={`${
+                    remainingAfterBuy >= 0 ? "text-green-500" : "text-red-500"
+                  }`}
+                >
+                  ${remainingAfterBuy.toFixed(2)}
+                </span>
+              </div>
+              <div>
+                <label
+                  htmlFor="quantity"
+                  className="font-semibold text-teal-400"
+                >
+                  Quantity
+                </label>
+                <input
+                  type="number"
+                  id="quantity"
+                  min="1"
+                  max={maxQuantity}
+                  value={quantity}
+                  onChange={handleQuantityChange}
+                  className="w-full px-2 py-1 mt-1 rounded-md bg-gray-700 text-gray-300 focus:outline-none focus:ring focus:ring-teal-400"
+                />
+                <small className="text-gray-400">
+                  Max Quantity: {maxQuantity} shares
+                </small>
+              </div>
+              <button
+                onClick={handleBuy}
+                className="w-full bg-green-500 text-gray-900 py-2 rounded-md font-bold hover:bg-green-400"
+              >
+                Buy
+              </button>
+              <ErrorModal
+                isVisible={showErrorModal}
+                onClose={handleModalClose}
+                title="Purchase Error"
+                message={errorMessage}
+              />
+              <button
+                onClick={handleSell}
+                className="w-full bg-red-500 text-gray-900 py-2 rounded-md font-bold hover:bg-red-400"
+              >
+                Sell
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
