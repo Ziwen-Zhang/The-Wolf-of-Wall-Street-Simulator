@@ -33,14 +33,13 @@ function UserHomePage() {
 
   useEffect(() => {
     if (user) {
-      // Simulate adding data to the investing graph every 3 seconds
+
       const interval = setInterval(() => {
         setInvestingHistory((prevState) => {
           const now = new Date().toLocaleTimeString();
           const updatedPrices = [...prevState.prices, user.total_net_worth];
           const updatedTimestamps = [...prevState.timestamps, now];
 
-          // Limit the history to 20 data points
           if (updatedPrices.length > 20) {
             updatedPrices.shift();
             updatedTimestamps.shift();

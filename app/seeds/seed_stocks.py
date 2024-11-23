@@ -7,7 +7,7 @@ def seed_stocks():
         {
             "name": "Apple",
             "symbol": "AAPL",
-            "description": "Tech giant",
+            "description": "A globally renowned technology company that has revolutionized consumer electronics with innovative products such as the iPhone, iPad, Mac computers, and Apple Watch. It also offers software services like iOS, macOS, and subscription platforms like Apple Music and iCloud.",
             "price": 150.0,
             "initial_price": 150.0,
             "total_shares": int(100000000 / 150.0),
@@ -17,7 +17,7 @@ def seed_stocks():
         {
             "name": "Tesla",
             "symbol": "TSLA",
-            "description": "Electric vehicles",
+            "description": "A leader in the electric vehicle market, known for its cutting-edge designs and technologies in cars like the Model S, Model 3, and Model Y. Tesla also develops clean energy solutions, including solar panels and energy storage products like the Powerwall.",
             "price": 700.0,
             "initial_price": 700.0,
             "total_shares": int(50000000 / 700.0),
@@ -27,7 +27,7 @@ def seed_stocks():
         {
             "name": "Amazon",
             "symbol": "AMZN",
-            "description": "E-commerce leader",
+            "description": "The world's largest online retailer, providing a vast range of products and services. It is also a dominant player in cloud computing through Amazon Web Services (AWS), enabling businesses to operate efficiently.",
             "price": 3300.0,
             "initial_price": 3300.0,
             "total_shares": int(150000000 / 3300.0),
@@ -37,7 +37,7 @@ def seed_stocks():
         {
             "name": "Google",
             "symbol": "GOOGL",
-            "description": "Search engine giant",
+            "description": "A cornerstone of the digital age, specializing in internet search, digital advertising, and a suite of products like Gmail, Google Maps, and the Android operating system. It also explores AI, cloud computing, and hardware innovations.",
             "price": 2800.0,
             "initial_price": 2800.0,
             "total_shares": int(120000000 / 2800.0),
@@ -47,7 +47,7 @@ def seed_stocks():
         {
             "name": "Microsoft",
             "symbol": "MSFT",
-            "description": "Software and cloud",
+            "description": "A software powerhouse known for Windows, Office 365, and its Azure cloud services. It also ventures into hardware with products like Surface devices and gaming through Xbox.",
             "price": 320.0,
             "initial_price": 320.0,
             "total_shares": int(110000000 / 320.0),
@@ -57,7 +57,7 @@ def seed_stocks():
         {
             "name": "Meta",
             "symbol": "META",
-            "description": "Social media leader",
+            "description": "A social media and technology company previously known as Facebook. It operates platforms like Facebook, Instagram, and WhatsApp, while investing heavily in augmented reality and virtual reality to build the metaverse.",
             "price": 340.0,
             "initial_price": 340.0,
             "total_shares": int(90000000 / 340.0),
@@ -67,7 +67,7 @@ def seed_stocks():
         {
             "name": "NVIDIA",
             "symbol": "NVDA",
-            "description": "Graphics cards and AI",
+            "description": "A leader in graphics processing units (GPUs) for gaming, professional visualization, and AI computing. Its technology is a backbone for high-performance computing, autonomous vehicles, and data centers.I",
             "price": 500.0,
             "initial_price": 500.0,
             "total_shares": int(70000000 / 500.0),
@@ -77,7 +77,7 @@ def seed_stocks():
         {
             "name": "Netflix",
             "symbol": "NFLX",
-            "description": "Streaming platform",
+            "description": "A pioneering streaming service offering a vast library of movies, TV shows, and original content. It has transformed how audiences consume media with its on-demand subscription model.",
             "price": 400.0,
             "initial_price": 400.0,
             "total_shares": int(60000000 / 400.0),
@@ -87,7 +87,7 @@ def seed_stocks():
         {
             "name": "Disney",
             "symbol": "DIS",
-            "description": "Entertainment and media",
+            "description": "A world-famous entertainment company producing animated and live-action films, TV content, and operating theme parks like Disneyland and Disney World. It also owns Marvel, Star Wars, and National Geographic.",
             "price": 120.0,
             "initial_price": 120.0,
             "total_shares": int(80000000 / 120.0),
@@ -97,7 +97,7 @@ def seed_stocks():
         {
             "name": "Coca-Cola",
             "symbol": "KO",
-            "description": "Beverage giant",
+            "description": "A beverage giant recognized globally for its flagship Coca-Cola drink, along with an extensive portfolio of sparkling and still beverages, including Sprite, Fanta, and Dasani water.",
             "price": 60.0,
             "initial_price": 60.0,
             "total_shares": int(60000000 / 60.0),
@@ -107,7 +107,7 @@ def seed_stocks():
         {
             "name": "PepsiCo",
             "symbol": "PEP",
-            "description": "Food and beverage",
+            "description": "A diversified food and beverage company with brands like Pepsi, Gatorade, Lay's, and Quaker Oats. It balances its portfolio with a focus on healthy and sustainable products.",
             "price": 150.0,
             "initial_price": 150.0,
             "total_shares": int(65000000 / 150.0),
@@ -117,7 +117,7 @@ def seed_stocks():
         {
             "name": "Exxon Mobil",
             "symbol": "XOM",
-            "description": "Oil and gas",
+            "description": "One of the world's largest oil and gas companies, involved in the exploration, production, refining, and distribution of energy resources. It also invests in renewable energy technologies.",
             "price": 110.0,
             "initial_price": 110.0,
             "total_shares": int(100000000 / 110.0),
@@ -127,7 +127,7 @@ def seed_stocks():
         {
             "name": "Chevron",
             "symbol": "CVX",
-            "description": "Energy corporation",
+            "description": "A leading energy corporation focusing on oil, gas, and alternative energy. It is known for innovation in energy efficiency and advanced technologies in the energy sector.",
             "price": 130.0,
             "initial_price": 130.0,
             "total_shares": int(95000000 / 130.0),
@@ -137,7 +137,7 @@ def seed_stocks():
         {
             "name": "Intel",
             "symbol": "INTC",
-            "description": "Semiconductors",
+            "description": "A pioneer in semiconductor manufacturing, designing high-performance microprocessors and technologies that power computers, data centers, and AI applications.",
             "price": 40.0,
             "initial_price": 40.0,
             "total_shares": int(40000000 / 40.0),
@@ -147,7 +147,7 @@ def seed_stocks():
         {
             "name": "AMD",
             "symbol": "AMD",
-            "description": "Microprocessors",
+            "description": "A competitor to Intel, AMD specializes in producing processors, GPUs, and high-performance computing solutions for gaming, enterprise, and cloud computing.",
             "price": 100.0,
             "initial_price": 100.0,
             "total_shares": int(50000000 / 100.0),
@@ -157,7 +157,7 @@ def seed_stocks():
         {
             "name": "Ford",
             "symbol": "F",
-            "description": "Automobile manufacturer",
+            "description": "A long-established automobile manufacturer that produces a wide range of vehicles, including passenger cars, SUVs, trucks, and electric vehicles like the Mustang Mach-E.",
             "price": 20.0,
             "initial_price": 20.0,
             "total_shares": int(30000000 / 20.0),
@@ -167,7 +167,7 @@ def seed_stocks():
         {
             "name": "General Motors",
             "symbol": "GM",
-            "description": "Automotive company",
+            "description": "A global automotive company producing brands like Chevrolet, Cadillac, and GMC. It focuses on sustainable technologies like electric and autonomous vehicles.",
             "price": 30.0,
             "initial_price": 30.0,
             "total_shares": int(35000000 / 30.0),
@@ -177,7 +177,7 @@ def seed_stocks():
         {
             "name": "Boeing",
             "symbol": "BA",
-            "description": "Aerospace leader",
+            "description": "An aerospace leader manufacturing commercial airplanes, military aircraft, satellites, and space exploration technologies. It plays a crucial role in global aviation and defense.",
             "price": 200.0,
             "initial_price": 200.0,
             "total_shares": int(85000000 / 200.0),
@@ -187,7 +187,7 @@ def seed_stocks():
         {
             "name": "Starbucks",
             "symbol": "SBUX",
-            "description": "Coffeehouse chain",
+            "description": "A premium coffeehouse chain that has become a global phenomenon, offering high-quality coffee, teas, and snacks, alongside a comfortable and social café experience.",
             "price": 100.0,
             "initial_price": 100.0,
             "total_shares": int(50000000 / 100.0),
@@ -197,7 +197,7 @@ def seed_stocks():
         {
             "name": "Walmart",
             "symbol": "WMT",
-            "description": "Retail corporation",
+            "description": "A retail giant known for offering affordable products across categories such as groceries, apparel, electronics, and more, both in-store and online through its extensive e-commerce operations.",
             "price": 150.0,
             "initial_price": 150.0,
             "total_shares": int(100000000 / 150.0),
@@ -207,7 +207,7 @@ def seed_stocks():
         {
             "name": "Target",
             "symbol": "TGT",
-            "description": "Retail giant",
+            "description": "A popular retail chain known for its stylish and affordable products, offering everything from clothing and home goods to groceries and electronics, all with a focus on quality and design.",
             "price": 130.0,
             "initial_price": 130.0,
             "total_shares": int(70000000 / 130.0),

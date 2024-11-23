@@ -1,3 +1,243 @@
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { startStockUpdates } from "../../redux/stock";
+import { Line } from "react-chartjs-2";
+import { useParams } from "react-router-dom";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+function StockDetailPage() {
+  const { stockId } = useParams();
+  const dispatch = useDispatch();
+  const stocks = useSelector((state) => state.stock.stocks);
+  const allRecords = useSelector((state) => state.stock.allRecords);
+  const stock = stocks.find((s) => s.id === Number(stockId));
+  const stockHistory = allRecords[String(stockId)] || {
+    priceHistory: [],
+    timestamps: [],
+  };
+
+  const user = useSelector((state) => state.session.user);
+
+  useEffect(() => {
+    const savedData = localStorage.getItem("stockHistoryData");
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      dispatch({
+        type: "stock/setStockRecords",
+        payload: { stocks: [], allRecords: parsedData },
+      });
+    }
+
+    const cleanup = dispatch(startStockUpdates());
+
+    return () => {
+      cleanup && cleanup();
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (Object.keys(allRecords).length > 0) {
+      localStorage.setItem("stockHistoryData", JSON.stringify(allRecords));
+    }
+  }, [allRecords]);
+
+  if (!stock) {
+    return <div>Loading stock data...</div>;
+  }
+
+  if (!stockHistory.priceHistory.length || !stockHistory.timestamps.length) {
+    return <div className="text-gray-500">Loading chart data...</div>;
+  }
+
+  const isAboveInitialPrice =
+    stockHistory.priceHistory.length > 0 &&
+    stockHistory.priceHistory[stockHistory.priceHistory.length - 1] >=
+      stock.initial_price;
+
+  const lineColor =
+    stock.price > stock.initial_price ? "rgba(0,255,0,1)" : "rgba(255,0,0,1)";
+
+  const data = {
+    labels: stockHistory.timestamps,
+    datasets: [
+      {
+        data: stockHistory.priceHistory,
+        borderColor: isAboveInitialPrice
+          ? "rgba(0,255,0,1)"
+          : "rgba(255,0,0,1)",
+        borderWidth: 2,
+        backgroundColor: "rgba(0,0,0,0)",
+        fill: false,
+        pointRadius: 0.3,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: false,
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          autoSkip: true,
+          maxTicksLimit: 10,
+        },
+      },
+      y: {
+        beginAtZero: false,
+      },
+    },
+  };
+
+  return (
+    <div className="p-8 h-screen bg-gray-800 text-gray-300 overflow-y-auto text-left scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-800 hover:scrollbar-thumb-gray-400">
+      <h1 className="text-2xl font-bold mb-4 text-teal-400">
+        {stock.name} ({stock.symbol})
+        <p className="text-xl font-semibold" style={{ color: lineColor }}>
+          ${stock.price}
+        </p>
+      </h1>
+
+      <div className="bg-gray-900 p-4 rounded-lg shadow-lg w-full h-64 sm:h-96">
+        <Line data={data} options={options} />
+      </div>
+      <div className="grid mt-4">
+        <h2 className="text-lg font-semibold text-teal-400">
+          About {stock.name}
+        </h2>
+        <div className="text-gray-400 mb-4">{stock.description}</div>
+        <div className="flex text-lg mb-4 font-semibold text-teal-400">
+          <div className="w-1/3 text-center">Stats</div>
+          <div className="w-1/3 text-center">Owned Shares</div>
+          <div className="w-1/3 text-center">Trading</div>
+        </div>
+        <div className="flex">
+          <div className="w-1/3 space-y-2 px-4">
+            <div className="space-y-5">
+              <div className="flex justify-between">
+                <span className="font-bold text-teal-400">Initial Price:</span>{" "}
+                <span className="text-green-500">
+                  ${stock.initial_price.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-bold text-teal-400">Current Price:</span>{" "}
+                <span className="text-green-500">
+                  ${stock.price.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-bold text-teal-400">Change:</span>{" "}
+                <span
+                  className={
+                    stock.price > stock.initial_price
+                      ? "text-green-500"
+                      : "text-red-500"
+                  }
+                >
+                  {(
+                    ((stock.price - stock.initial_price) /
+                      stock.initial_price) *
+                    100
+                  ).toFixed(2)}
+                  %
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-bold text-teal-400">Highest Today:</span>{" "}
+                <span className="text-yellow-400">
+                  ${Math.max(...stockHistory.priceHistory).toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-bold text-teal-400">Lowest Today:</span>{" "}
+                <span className="text-red-400">
+                  ${Math.min(...stockHistory.priceHistory).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="w-1/3 space-y-2 px-4">
+            {!user ? (
+              <div className="text-red-500 text-center">
+                You need to log in to view this section.
+              </div>
+            ) : (
+              (() => {
+                const ownedShare = user.shares.find(
+                  (share) => share.stock_id === stock.id
+                );
+                return ownedShare ? (
+                  <div className="text-gray-400 space-y-2">
+                    <div className="flex justify-between">
+                      <span className="font-bold text-teal-400">Quantity:</span>
+                      <span>{ownedShare.quantity.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-bold text-teal-400">
+                        Average Price:
+                      </span>
+                      <span>${ownedShare.average_price.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-bold text-teal-400">
+                        Current Price:
+                      </span>
+                      <span>${ownedShare.current_price.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-bold text-teal-400">
+                        Total Value:
+                      </span>
+                      <span>${ownedShare.total_value.toFixed(2)}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-gray-500 text-center">
+                    You do not own any shares of this stock.
+                  </div>
+                );
+              })()
+            )}
+          </div>
+          <div className="w-1/3 space-y-2 px-4">
+          hello
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default StockDetailPage;
+
 // import { useEffect, useState } from "react";
 // import { useParams } from "react-router-dom";
 // import { io } from "socket.io-client";
@@ -142,170 +382,3 @@
 // }
 
 // export default StockDetailPage;
-
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { startStockUpdates } from "../../redux/stock";
-import { Line } from "react-chartjs-2";
-import { useParams } from "react-router-dom";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-function StockDetailPage() {
-  const { stockId } = useParams();
-  const dispatch = useDispatch();
-  const stocks = useSelector((state) => state.stock.stocks);
-  const allRecords = useSelector((state) => state.stock.allRecords);
-  const stock = stocks.find((s) => s.id === Number(stockId));
-  const stockHistory = allRecords[String(stockId)] || {
-    priceHistory: [],
-    timestamps: [],
-  };
-
-  useEffect(() => {
-    const savedData = localStorage.getItem("stockHistoryData");
-    if (savedData) {
-      const parsedData = JSON.parse(savedData);
-      dispatch({
-        type: "stock/setStockRecords",
-        payload: { stocks: [], allRecords: parsedData },
-      });
-    }
-
-    const cleanup = dispatch(startStockUpdates());
-
-    return () => {
-      cleanup && cleanup();
-    };
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (Object.keys(allRecords).length > 0) {
-      localStorage.setItem("stockHistoryData", JSON.stringify(allRecords));
-    }
-  }, [allRecords]);
-
-  if (!stock) {
-    return <div>Loading stock data...</div>;
-  }
-
-  if (!stockHistory.priceHistory.length || !stockHistory.timestamps.length) {
-    return <div className="text-gray-500">Loading chart data...</div>;
-  }
-
-  const isAboveInitialPrice =
-    stockHistory.priceHistory.length > 0 &&
-    stockHistory.priceHistory[stockHistory.priceHistory.length - 1] >=
-      stock.initial_price;
-
-  const lineColor =
-    stock.price > stock.initial_price ? "rgba(0,255,0,1)" : "rgba(255,0,0,1)";
-
-  const data = {
-    labels: stockHistory.timestamps,
-    datasets: [
-      {
-        data: stockHistory.priceHistory,
-        borderColor: isAboveInitialPrice
-          ? "rgba(0,255,0,1)"
-          : "rgba(255,0,0,1)",
-        borderWidth: 2,
-        backgroundColor: "rgba(0,0,0,0)",
-        fill: false,
-        pointRadius: 0.3,
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false,
-      },
-      title: {
-        display: false,
-      },
-    },
-    scales: {
-      x: {
-        ticks: {
-          autoSkip: true,
-          maxTicksLimit: 10,
-        },
-      },
-      y: {
-        beginAtZero: false,
-      },
-    },
-  };
-
-  return (
-    <div className="p-8 bg-gray-800 text-gray-300 max-h-screen overflow-y-auto text-left scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-800 hover:scrollbar-thumb-gray-400">
-      <h1 className="text-2xl font-bold mb-4 text-teal-400">
-        {stock.name} ({stock.symbol})
-        <p className="text-xl font-semibold" style={{ color: lineColor }}>
-          ${stock.price}
-        </p>
-      </h1>
-  
-      <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
-        <Line data={data} options={options} />
-      </div>
-      <div className="flex ">
-      <div className="mt-4">
-        <h2 className="text-lg font-semibold text-teal-400">Description</h2>
-        <div className="text-gray-400 mb-4">{stock.description}</div>
-  
-        <h2 className="text-lg font-semibold text-teal-400">Details</h2>
-        <div className="space-y-2">
-          <div>
-            <span className="font-bold text-teal-400">Initial Price:</span>{" "}
-            <span className="text-green-500">${stock.initial_price.toFixed(2)}</span>
-          </div>
-          <div>
-            <span className="font-bold text-teal-400">Current Price:</span>{" "}
-            <span className="text-green-500">${stock.price.toFixed(2)}</span>
-          </div>
-          <div>
-            <span className="font-bold text-teal-400">Change:</span>{" "}
-            <span
-              className={
-                stock.price > stock.initial_price
-                  ? "text-green-500"
-                  : "text-red-500"
-              }
-            >
-              {((stock.price - stock.initial_price) / stock.initial_price * 100).toFixed(2)}%
-            </span>
-            
-          </div>
-                <span>hihi</span>
-        </div>
-                <span>hihi</span>
-      </div>
-      <div>hello</div>
-      </div>
-    </div>
-  );
-}
-
-export default StockDetailPage;
