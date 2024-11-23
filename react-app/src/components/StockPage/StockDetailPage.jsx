@@ -175,20 +175,16 @@ function StockDetailPage() {
   const dispatch = useDispatch();
   const stocks = useSelector((state) => state.stock.stocks);
   const allRecords = useSelector((state) => state.stock.allRecords);
-
   const stock = stocks.find((s) => s.id === Number(stockId));
   const stockHistory = allRecords[String(stockId)] || { priceHistory: [], timestamps: [] };
 
-  // 从 Local Storage 恢复数据
   useEffect(() => {
     const savedData = localStorage.getItem("stockHistoryData");
     if (savedData) {
       const parsedData = JSON.parse(savedData);
-      console.log("Restoring data from Local Storage:", parsedData);
       dispatch({ type: "stock/setStockRecords", payload: { stocks: [], allRecords: parsedData } });
     }
 
-    // 启动实时数据更新
     const cleanup = dispatch(startStockUpdates());
 
     return () => {
@@ -196,10 +192,8 @@ function StockDetailPage() {
     };
   }, [dispatch]);
 
-  // 保存到 Local Storage
   useEffect(() => {
     if (Object.keys(allRecords).length > 0) {
-      console.log("Saving data to Local Storage:", allRecords);
       localStorage.setItem("stockHistoryData", JSON.stringify(allRecords));
     }
   }, [allRecords]);

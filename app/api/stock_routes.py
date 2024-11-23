@@ -8,8 +8,7 @@ stocks_routes = Blueprint("stocks", __name__)
 
 @stocks_routes.route("/all", methods=["GET"])
 def get_all_stocks():
-    stocks: List[Stock] = Stock.query.all()
-    print(f"{stocks=}")
+    stocks: List[Stock] = Stock.query.order_by(Stock.id.asc()).all()
     stock_list = [stock.to_dict() for stock in stocks]
     return jsonify({"stocks": stock_list})
 

@@ -46,7 +46,6 @@ export const startStockUpdates = () => (dispatch) => {
   const intervalId = setInterval(() => {
     dispatch(thunkGetStocks());
   }, 3000);
-
   return () => clearInterval(intervalId);
 };
 

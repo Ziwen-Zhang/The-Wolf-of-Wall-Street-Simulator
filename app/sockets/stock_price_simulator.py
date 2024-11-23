@@ -11,10 +11,25 @@ def stock_price_simulator(socketio):
                 updated_stocks = []
 
                 for stock in stocks:
-                    percentage_change = random.uniform(-0.01, 0.01)
+                    # percentage_change = random.uniform(-0.01, 0.01)
+                    # new_price = stock.price * (1 + percentage_change)
+                    # stock.price = round(new_price, 2)
+                    # db.session.add(stock)
+
+                    #new simulation
+                    lower_bound = stock.initial_price * 0.5
+                    upper_bound = stock.initial_price * 1.5
+                    if stock.price < lower_bound:
+                        percentage_change = random.uniform(-0.01, 0.05)
+                    elif stock.price > upper_bound:
+                        percentage_change = random.uniform(-0.05, 0.01)
+                    else:
+                        percentage_change = random.uniform(-0.05, 0.05)
+
                     new_price = stock.price * (1 + percentage_change)
                     stock.price = round(new_price, 2)
                     db.session.add(stock)
+                    #### new
 
                     stock_data = {
                         "id": stock.id,
@@ -38,8 +53,8 @@ def stock_price_simulator(socketio):
                     db.session.add(user)
 
                 db.session.commit()
-                socketio.emit("stock_update", {"stocks": updated_stocks})
-                print("Updated stock prices and users' net worth sent to clients.")
+                # socketio.emit("stock_update", {"stocks": updated_stocks})
+                # print("Updated stock prices and users' net worth sent to clients.")
 
         except Exception as e:
             print(f"Error in stock_price_simulator: {e}")

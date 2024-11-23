@@ -16,6 +16,7 @@ class Stock(Base):
     symbol = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
     price = db.Column(db.Float, nullable=False) 
+    initial_price = db.Column(db.Float, nullable=False)
 
     total_shares = db.Column(db.Integer, nullable=False, default=0)
     remaining_shares = db.Column(db.Integer, nullable=False)
@@ -40,6 +41,7 @@ class Stock(Base):
             "name": self.name,
             "symbol": self.symbol,
             "description": self.description,
+            "initial_price": self.initial_price,
             "price": self.price,
             "total_shares": self.total_shares,
             "remaining_shares": self.remaining_shares,

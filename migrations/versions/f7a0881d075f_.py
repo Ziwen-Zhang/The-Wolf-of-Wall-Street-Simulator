@@ -62,6 +62,7 @@ def upgrade():
     sa.Column('symbol', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=False),
     sa.Column('price', sa.Float(), nullable=False),
+    sa.Column('initial_price', sa.Float(), nullable=False), 
     sa.Column('total_shares', sa.Integer(), nullable=False),
     sa.Column('remaining_shares', sa.Integer(), nullable=False),
     sa.Column('tag_id', sa.Integer(), nullable=True),
