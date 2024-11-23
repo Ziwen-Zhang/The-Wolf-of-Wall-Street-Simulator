@@ -259,20 +259,50 @@ function StockDetailPage() {
   };
 
   return (
-    <div className="p-6 bg-gray-900 text-white rounded-lg shadow-md max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 ">
+    <div className="p-8 bg-gray-800 text-gray-300 max-h-screen overflow-y-auto text-left scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-800 hover:scrollbar-thumb-gray-400">
+      <h1 className="text-2xl font-bold mb-4 text-teal-400">
         {stock.name} ({stock.symbol})
         <p className="text-xl font-semibold" style={{ color: lineColor }}>
           ${stock.price}
         </p>
       </h1>
-
-      <div className="bg-gray-800 p-4 rounded-md shadow-md">
+  
+      <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
         <Line data={data} options={options} />
       </div>
-      <div className="flex-col">
-        <span >Description</span>
-        <div className="text-gray-500">{stock.description}</div>
+      <div className="flex ">
+      <div className="mt-4">
+        <h2 className="text-lg font-semibold text-teal-400">Description</h2>
+        <div className="text-gray-400 mb-4">{stock.description}</div>
+  
+        <h2 className="text-lg font-semibold text-teal-400">Details</h2>
+        <div className="space-y-2">
+          <div>
+            <span className="font-bold text-teal-400">Initial Price:</span>{" "}
+            <span className="text-green-500">${stock.initial_price.toFixed(2)}</span>
+          </div>
+          <div>
+            <span className="font-bold text-teal-400">Current Price:</span>{" "}
+            <span className="text-green-500">${stock.price.toFixed(2)}</span>
+          </div>
+          <div>
+            <span className="font-bold text-teal-400">Change:</span>{" "}
+            <span
+              className={
+                stock.price > stock.initial_price
+                  ? "text-green-500"
+                  : "text-red-500"
+              }
+            >
+              {((stock.price - stock.initial_price) / stock.initial_price * 100).toFixed(2)}%
+            </span>
+            
+          </div>
+                <span>hihi</span>
+        </div>
+                <span>hihi</span>
+      </div>
+      <div>hello</div>
       </div>
     </div>
   );

@@ -88,14 +88,14 @@ function StockSideBar() {
       <h2 className="text-xl text-center font-bold mb-4 text-yellow-400">
         Stock List
       </h2>
-      <div className="space-y-4">
+      <div>
         {stocks.map((stock) => {
           const priceColor =
             stock.price > stock.initial_price ? "text-green-400" : "text-red-400";  
           return (
             <Link to={`/stocks/${stock.id}`} key={stock.id}>
               <div
-                className={`p-4 rounded-md shadow-md cursor-pointer ${
+                className={`p-4 rounded-md mb-1 cursor-pointer ${
                   stock.id.toString() === stockId
                     ? "bg-gray-700 border-2 border-yellow-400"
                     : "bg-gray-900 hover:bg-gray-700"

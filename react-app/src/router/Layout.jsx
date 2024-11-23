@@ -5,6 +5,7 @@ import { thunkAuthenticate } from "../redux/session";
 import Navigation from "../components/Navigation/Navigation";
 import StockSideBar from "../components/HomePage/StockSideBar";
 import StockDetailPage from "../components/StockPage/StockDetailPage";
+import UserHomePage from "../components/UserHomePage/UserHomePage";
 
 export default function Layout() {
   const dispatch = useDispatch();
@@ -19,12 +20,14 @@ export default function Layout() {
       <div className="flex flex-col h-screen">
         <Navigation />
 
-        <div className="flex flex-1">
-          <div className="w-1/4 bg-gray-800 shadow-md">
+        <div className="flex">
+          <div className="w-1/4 border-2 border-gray-900">
             <StockSideBar />
           </div>
-
-          <div className="flex-1 overflow-y-auto p-6">
+          {/* <div className="w-3/4 border-2 border-gray-900">
+            <UserHomePage/>
+          </div> */}
+          <div className="w-3/4 border-2 border-gray-900">
             {isLoaded && <StockDetailPage />}
           </div>
         </div>
