@@ -53,7 +53,7 @@ export const startStockUpdates = () => (dispatch) => {
 const initialState = {
   stock: null, 
   stocks: [],
-  allRecords: {}, 
+  allRecords: JSON.parse(localStorage.getItem("stockHistoryData")) || {},
 };
 
 // Reducer
@@ -98,7 +98,7 @@ function stockReducer(state = initialState, action) {
 
       return {
         ...state,
-        allRecords: { ...state.allRecords, ...action.payload.allRecords }
+        allRecords: updatedRecords
       };
     }
 
