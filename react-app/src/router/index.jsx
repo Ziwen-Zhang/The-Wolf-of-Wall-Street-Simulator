@@ -1,11 +1,10 @@
-import { createBrowserRouter } from 'react-router-dom';
-import LoginFormPage from '../components/LoginFormPage';
-import SignupFormPage from '../components/SignupFormPage';
-import Layout from './Layout';
-import StockDetailPage from '../components/StockPage/StockDetailPage';
-import StockSideBar from '../components/HomePage/StockSideBar'
-import UserHomePage from '../components/UserHomePage/UserHomePage';
-
+import { createBrowserRouter } from "react-router-dom";
+import LoginFormPage from "../components/LoginFormPage";
+import SignupFormPage from "../components/SignupFormPage";
+import Layout from "./Layout";
+import StockDetailPage from "../components/StockPage/StockDetailPage";
+import UserHomePage from "../components/UserHomePage/UserHomePage";
+import HomePageRedirect from "../components/HomePage/HomePageRedirect";
 
 export const router = createBrowserRouter([
   {
@@ -13,7 +12,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element:<StockSideBar />,
+        element: <HomePageRedirect />,
       },
       {
         path: "login",
@@ -28,9 +27,9 @@ export const router = createBrowserRouter([
         element: <StockDetailPage />,
       },
       {
-        path:"/user",
-        element:<UserHomePage/>
-      }
+        path: "user",
+        element: <UserHomePage />,
+      },
     ],
   },
 ]);

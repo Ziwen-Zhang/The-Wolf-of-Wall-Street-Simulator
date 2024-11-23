@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setStockRecords, startStockUpdates } from "../../redux/stock";
-import { thunkBuyStock, thunkSellStock } from "../../redux/transaction";
 import { Line } from "react-chartjs-2";
 import { useParams } from "react-router-dom";
 import {
@@ -14,8 +13,6 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { thunkAuthenticate } from "../../redux/session";
-import ErrorModal from "../ErrorModal/ErrorModal";
 
 ChartJS.register(
   CategoryScale,
@@ -38,45 +35,15 @@ function StockDetailPage() {
     priceHistory: [],
     timestamps: [],
   };
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
 
   const user = useSelector((state) => state.session.user);
   const ownedShares = useSelector((state) => state.ownedShares.ownedShares);
-
-  const [quantity, setQuantity] = useState(1);
-  const [remainingAfterBuy, setRemainingAfterBuy] = useState(
-    user?.buying_power || 0
-  );
-  const [maxQuantity, setMaxQuantity] = useState(
-    Math.floor(user?.buying_power / stock?.price) || 0
-  );
-
-  useEffect(() => {
-    if (user && stock) {
-      setMaxQuantity(Math.floor(user.buying_power / stock.price));
-      setRemainingAfterBuy(user.buying_power - quantity * stock.price);
-    }
-  }, [user, stock, quantity]);
-
-  const handleQuantityChange = (e) => {
-    const inputValue = parseFloat(e.target.value);
-    if (inputValue > maxQuantity) {
-      setQuantity(maxQuantity);
-      setRemainingAfterBuy(user.buying_power - maxQuantity * stock.price);
-    } else {
-      setQuantity(inputValue || 0);
-      setRemainingAfterBuy(user.buying_power - inputValue * stock.price);
-    }
-  };
 
   useEffect(() => {
     const savedData = localStorage.getItem("stockHistoryData");
     if (savedData) {
       const parsedData = JSON.parse(savedData);
       dispatch(setStockRecords({ stocks: [], allRecords: parsedData }));
-      // Remove this line:
-      // setLoading(false)
     }
     return dispatch(startStockUpdates());
   }, [dispatch]);
@@ -150,31 +117,9 @@ function StockDetailPage() {
     },
   };
 
-  const handleBuy = () => {
-    if (!quantity || quantity <= 0) return;
-
-    if (remainingAfterBuy < 0) {
-      setErrorMessage("Insufficient buying power! Please adjust the quantity.");
-      setShowErrorModal(true);
-    } else {
-      dispatch(thunkBuyStock(stock.id, quantity));
-      dispatch(thunkAuthenticate());
-    }
-  };
-
-  const handleModalClose = () => {
-    setShowErrorModal(false);
-    setErrorMessage("");
-  };
-
-  const handleSell = () => {
-    if (!quantity || quantity <= 0) return;
-    dispatch(thunkSellStock(stock.id, quantity));
-    dispatch(thunkAuthenticate());
-  };
 
   return (
-    <div className="p-8 h-screen bg-gray-800 text-gray-300 overflow-y-auto text-left scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-800 hover:scrollbar-thumb-gray-400">
+    <div className="p-8 h-screen bg-gray-800 text-gray-300 text-left">
       <h1 className="text-2xl font-bold mb-4 text-teal-400">
         {stock.name} ({stock.symbol})
         <p className="text-xl font-semibold" style={{ color: lineColor }}>
@@ -191,12 +136,11 @@ function StockDetailPage() {
         </h2>
         <div className="text-gray-400 mb-4">{stock.description}</div>
         <div className="flex text-lg mb-4 font-semibold text-teal-400">
-          <div className="w-1/3 text-center">Stats</div>
-          <div className="w-1/3 text-center">Owned Shares</div>
-          <div className="w-1/3 text-center">Trading</div>
+          <div className="w-1/2 text-center">Stats</div>
+          <div className="w-1/2 text-center">Owned Shares</div>
         </div>
         <div className="flex">
-          <div className="w-1/3 space-y-2 px-4">
+          <div className="w-1/2 space-y-2 px-16">
             {/* Stats Section */}
             <div className="space-y-8">
               <div className="flex justify-between">
@@ -242,7 +186,7 @@ function StockDetailPage() {
               </div>
             </div>
           </div>
-          <div className="w-1/3 space-y-2 px-4">
+          <div className="w-1/2 space-y-2 px-16">
             {!user ? (
               <div className="text-red-500 text-center">
                 You need to log in to view this section.
@@ -311,76 +255,6 @@ function StockDetailPage() {
               })()
             )}
           </div>
-          {!user ? (
-            <div className="text-red-500 text-center">
-              You need to log in to view this section.
-            </div>
-          ) : (
-            <div className="w-1/3 space-y-4 px-4">
-              <div className="flex justify-between">
-                <span className="font-semibold text-teal-400">
-                  Buying Power
-                </span>
-                <span className="text-green-500">
-                  ${user.buying_power.toFixed(2)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-semibold text-teal-400">Cost</span>
-                <span className="text-red-400">
-                  - ${(quantity * stock.price).toFixed(2)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-semibold text-teal-400">Remaining</span>
-                <span
-                  className={`${
-                    remainingAfterBuy >= 0 ? "text-green-500" : "text-red-500"
-                  }`}
-                >
-                  ${remainingAfterBuy.toFixed(2)}
-                </span>
-              </div>
-              <div>
-                <label
-                  htmlFor="quantity"
-                  className="font-semibold text-teal-400"
-                >
-                  Quantity
-                </label>
-                <input
-                  type="number"
-                  id="quantity"
-                  min="1"
-                  max={maxQuantity}
-                  value={quantity}
-                  onChange={handleQuantityChange}
-                  className="w-full px-2 py-1 mt-1 rounded-md bg-gray-700 text-gray-300 focus:outline-none focus:ring focus:ring-teal-400"
-                />
-                <small className="text-gray-400">
-                  Max Quantity: {maxQuantity} shares
-                </small>
-              </div>
-              <button
-                onClick={handleBuy}
-                className="w-full bg-green-500 text-gray-900 py-2 rounded-md font-bold hover:bg-green-400"
-              >
-                Buy
-              </button>
-              <ErrorModal
-                isVisible={showErrorModal}
-                onClose={handleModalClose}
-                title="Purchase Error"
-                message={errorMessage}
-              />
-              <button
-                onClick={handleSell}
-                className="w-full bg-red-500 text-gray-900 py-2 rounded-md font-bold hover:bg-red-400"
-              >
-                Sell
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>

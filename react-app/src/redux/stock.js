@@ -1,5 +1,5 @@
 import { thunkGetShares } from "./ownedshares";
-import { thunkAuthenticate } from "./session";
+// import { thunkAuthenticate } from "./session";
 
 const SET_STOCK = "stock/setStock";
 const SET_STOCKS = "stock/setStocks";

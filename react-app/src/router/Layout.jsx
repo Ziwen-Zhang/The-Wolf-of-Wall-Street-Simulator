@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ModalProvider, Modal } from "../context/Modal";
 import { thunkAuthenticate } from "../redux/session";
 import Navigation from "../components/Navigation/Navigation";
 import StockSideBar from "../components/HomePage/StockSideBar";
-import StockDetailPage from "../components/StockPage/StockDetailPage";
-import UserHomePage from "../components/UserHomePage/UserHomePage";
+import { Outlet, useParams } from 'react-router-dom';
+import TradingSideBar from "../components/HomePage/TradingSideBar";
 
 export default function Layout() {
   const dispatch = useDispatch();
+  const {stockId} = useParams()
   const [isLoaded, setIsLoaded] = useState(false);
+  const user = useSelector((state) => state.session.user);
 
   useEffect(() => {
     dispatch(thunkAuthenticate()).then(() => setIsLoaded(true));
@@ -19,17 +21,22 @@ export default function Layout() {
     <ModalProvider>
       <div className="flex flex-col h-screen">
         <Navigation />
-
         <div className="flex">
           <div className="w-1/4 border-2 border-gray-900">
             <StockSideBar />
           </div>
-          {/* <div className="w-3/4 border-2 border-gray-900">
-            <UserHomePage/>
-          </div> */}
-          <div className="w-3/4 border-2 border-gray-900">
-            {isLoaded && <StockDetailPage />}
+          <div
+            className={`border-2 border-gray-900 ${
+              user ? "w-2/4" : "w-3/4"
+            }`}
+          >
+            {isLoaded && <Outlet />}
           </div>
+          {user && (
+            <div className="w-1/4 border-2 border-gray-900">
+              {isLoaded && <TradingSideBar stockId={stockId} />}
+            </div>
+          )}
         </div>
       </div>
       <Modal />
