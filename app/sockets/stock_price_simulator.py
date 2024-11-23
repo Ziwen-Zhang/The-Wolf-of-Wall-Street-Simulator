@@ -11,7 +11,7 @@ def stock_price_simulator(socketio):
                 updated_stocks = []
 
                 for stock in stocks:
-                    percentage_change = random.uniform(-0.05, 0.05)
+                    percentage_change = random.uniform(-0.01, 0.01)
                     new_price = stock.price * (1 + percentage_change)
                     stock.price = round(new_price, 2)
                     db.session.add(stock)

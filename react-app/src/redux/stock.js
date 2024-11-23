@@ -1,5 +1,6 @@
 const SET_STOCK = "stock/setStock";
 const SET_STOCKS = "stock/setStocks";
+const SET_STOCK_RECORDS = "stock/setStockRecords";
 
 // Action Creators
 const setStock = (stock) => ({
@@ -11,6 +12,12 @@ export const setStocks = (stocks) => ({
   type: SET_STOCKS,
   payload: stocks,
 });
+
+export const setStockRecords = (updatedStocks) => ({
+  type: SET_STOCK_RECORDS,
+  payload: updatedStocks,
+});
+
 
 // Thunks
 export const thunkGetOneStock = (stockId) => async (dispatch) => {
@@ -24,19 +31,30 @@ export const thunkGetOneStock = (stockId) => async (dispatch) => {
 };
 
 export const thunkGetStocks = () => async (dispatch) => {
-  const response = await fetch("/api/stocks/all"); // 假设后端提供 `/api/stocks/all`
+  const response = await fetch("/api/stocks/all");
   if (response.ok) {
     const data = await response.json();
     dispatch(setStocks(data));
+    dispatch(setStockRecords(data));
   } else {
     console.error("Failed to fetch stocks");
   }
 };
 
-// Initial State
+export const startStockUpdates = () => (dispatch) => {
+  dispatch(thunkGetStocks());
+  const intervalId = setInterval(() => {
+    dispatch(thunkGetStocks());
+  }, 3000);
+
+  return () => clearInterval(intervalId);
+};
+
+
 const initialState = {
-  stock: null, // 当前选中的股票详情
-  stocks: [],  // 所有股票列表
+  stock: null, 
+  stocks: [],
+  allRecords: {}, 
 };
 
 // Reducer
@@ -44,15 +62,46 @@ function stockReducer(state = initialState, action) {
   switch (action.type) {
     case SET_STOCK:
       return {
-        ...state, // 保留其他状态
-        stock: action.payload.stock, // 更新单个股票
+        ...state,
+        stock: action.payload.stock,
       };
 
     case SET_STOCKS:
       return {
-        ...state, // 保留其他状态
-        stocks: action.payload.stocks, // 更新所有股票列表
+        ...state,
+        stocks: action.payload.stocks,
       };
+
+    case SET_STOCK_RECORDS: {
+      const updatedRecords = { ...state.allRecords };
+
+      action.payload.stocks.forEach((stock) => {
+        const id = String(stock.id); 
+        if (!updatedRecords[id]) {
+          updatedRecords[id] = {
+            priceHistory: [],
+            timestamps: [],
+            name: stock.name,
+            symbol: stock.symbol,
+            description: stock.description,
+          };
+        }
+      
+        updatedRecords[id].priceHistory.push(stock.price);
+        updatedRecords[id].timestamps.push(new Date().toLocaleTimeString());
+      
+        if (updatedRecords[id].priceHistory.length > 500) {
+          updatedRecords[id].priceHistory.shift();
+          updatedRecords[id].timestamps.shift();
+        }
+      });
+      
+
+      return {
+        ...state,
+        allRecords: { ...state.allRecords, ...action.payload.allRecords }
+      };
+    }
 
     default:
       return state;

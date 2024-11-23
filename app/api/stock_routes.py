@@ -2,7 +2,6 @@ from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
 from app.models import Stock, db, Transaction,Usershare
 from typing import List
-from ..utils.transaction import process_transaction
 
 stocks_routes = Blueprint("stocks", __name__)
 
