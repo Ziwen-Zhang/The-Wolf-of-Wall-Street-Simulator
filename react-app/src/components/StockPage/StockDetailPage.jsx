@@ -143,7 +143,6 @@
 
 // export default StockDetailPage;
 
-
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { startStockUpdates } from "../../redux/stock";
@@ -176,13 +175,19 @@ function StockDetailPage() {
   const stocks = useSelector((state) => state.stock.stocks);
   const allRecords = useSelector((state) => state.stock.allRecords);
   const stock = stocks.find((s) => s.id === Number(stockId));
-  const stockHistory = allRecords[String(stockId)] || { priceHistory: [], timestamps: [] };
+  const stockHistory = allRecords[String(stockId)] || {
+    priceHistory: [],
+    timestamps: [],
+  };
 
   useEffect(() => {
     const savedData = localStorage.getItem("stockHistoryData");
     if (savedData) {
       const parsedData = JSON.parse(savedData);
-      dispatch({ type: "stock/setStockRecords", payload: { stocks: [], allRecords: parsedData } });
+      dispatch({
+        type: "stock/setStockRecords",
+        payload: { stocks: [], allRecords: parsedData },
+      });
     }
 
     const cleanup = dispatch(startStockUpdates());
@@ -206,12 +211,22 @@ function StockDetailPage() {
     return <div className="text-gray-500">Loading chart data...</div>;
   }
 
+  const isAboveInitialPrice =
+    stockHistory.priceHistory.length > 0 &&
+    stockHistory.priceHistory[stockHistory.priceHistory.length - 1] >=
+      stock.initial_price;
+
+  const lineColor =
+    stock.price > stock.initial_price ? "rgba(0,255,0,1)" : "rgba(255,0,0,1)";
+
   const data = {
     labels: stockHistory.timestamps,
     datasets: [
       {
         data: stockHistory.priceHistory,
-        borderColor: "rgba(0,255,0,1)",
+        borderColor: isAboveInitialPrice
+          ? "rgba(0,255,0,1)"
+          : "rgba(255,0,0,1)",
         borderWidth: 2,
         backgroundColor: "rgba(0,0,0,0)",
         fill: false,
@@ -245,12 +260,19 @@ function StockDetailPage() {
 
   return (
     <div className="p-6 bg-gray-900 text-white rounded-lg shadow-md max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">
+      <h1 className="text-2xl font-bold mb-4 ">
         {stock.name} ({stock.symbol})
+        <p className="text-xl font-semibold" style={{ color: lineColor }}>
+          ${stock.price}
+        </p>
       </h1>
 
       <div className="bg-gray-800 p-4 rounded-md shadow-md">
         <Line data={data} options={options} />
+      </div>
+      <div className="flex-col">
+        <span >Description</span>
+        <div className="text-gray-500">{stock.description}</div>
       </div>
     </div>
   );
