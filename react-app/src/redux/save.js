@@ -20,9 +20,8 @@ export const updateSave = (save) => ({
   save,
 });
 
-export const deleteSave = (stockId, saveId) => ({
+export const deleteSave = (saveId) => ({
   type: DELETE_SAVE,
-  stockId,
   saveId,
 });
 
@@ -62,6 +61,7 @@ export const createSave = (saveData) => async (dispatch) => {
 };
 
 export const updateSaveThunk = (saveData) => async (dispatch) => {
+  console.log(saveData)
   try {
     const data = await fetchAPI("/api/saves/", {
       method: "PUT",
@@ -75,14 +75,14 @@ export const updateSaveThunk = (saveData) => async (dispatch) => {
 };
 
 
-export const deleteSaveThunk = (stockId, saveId) => async (dispatch) => {
+export const deleteSaveThunk = (saveId) => async (dispatch) => {
   try {
     await fetchAPI("/api/saves/", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ stock_id: stockId, id: saveId }),
+      body: JSON.stringify({ id: saveId }),
     });
-    dispatch(deleteSave(stockId, saveId));
+    dispatch(deleteSave(saveId));
   } catch (error) {
     console.error("Failed to delete save:", error);
   }
@@ -135,17 +135,16 @@ const savesReducer = (state = initialState, action) => {
       };
 
       case DELETE_SAVE: {
-        const { stockId, saveId } = action;
+        const { saveId } = action;
         return {
           ...state,
-          saves: {
-            ...state.saves,
-            [stockId]: state.saves[stockId].filter((s) => s.id !== saveId),
-          },
+          saves: Object.keys(state.saves).reduce((acc, stockId) => {
+            acc[stockId] = state.saves[stockId].filter((s) => s.id !== saveId);
+            return acc;
+          }, {}),
         };
       }
-      
-
+           
     default:
       return state;
   }

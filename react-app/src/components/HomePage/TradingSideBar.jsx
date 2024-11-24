@@ -183,7 +183,7 @@ function TradingSideBar() {
       >
         Sell
       </button>
-      <button className="w-full px-6 py-2 bg-yellow-400 text-red-700 font-bold rounded shadow-md hover:bg-red-700 hover:text-yellow-400 active:scale-95 active:bg-red-700 transition-transform duration-150"
+      <button className="w-full px-6 py-2 bg-yellow-400 text-red-700 font-bold rounded shadow-md hover:bg-red-700 hover:text-yellow-500 active:scale-95 active:bg-red-700 transition-transform duration-150"
       onClick={handleAllin}
       >
 

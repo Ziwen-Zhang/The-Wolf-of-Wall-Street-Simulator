@@ -78,25 +78,44 @@ def edit_save():
     return jsonify({"message": "Save updated successfully", "save": save.to_dict()}), 200
 
 
+# @save_routes.route("/", methods=["DELETE"])
+# @login_required
+# def delete_save():
+#     data = request.get_json()
+#     stock_id = data.get("stock_id")
+#     alert_type = data.get("alert_type")
+
+#     if not alert_type or alert_type not in ["above", "below"]:
+#         return jsonify({"error": "Invalid alert type"}), 400
+
+#     save = Save.query.filter_by(
+#         stock_id=stock_id, user_id=current_user.id, alert_type=alert_type
+#     ).first()
+
+#     if not save:
+#         return jsonify({"error": "Save not found"}), 404
+
+#     if save.user_id != current_user.id:
+#         return jsonify({"error": "Unauthorized"}), 403
+
+#     db.session.delete(save)
+#     db.session.commit()
+
+#     return jsonify({"message": "Save deleted successfully"}), 200
+
 @save_routes.route("/", methods=["DELETE"])
 @login_required
 def delete_save():
     data = request.get_json()
-    stock_id = data.get("stock_id")
-    alert_type = data.get("alert_type")
+    save_id = data.get("id")
 
-    if not alert_type or alert_type not in ["above", "below"]:
-        return jsonify({"error": "Invalid alert type"}), 400
+    if not save_id:
+        return jsonify({"error": "Save ID is required"}), 400
 
-    save = Save.query.filter_by(
-        stock_id=stock_id, user_id=current_user.id, alert_type=alert_type
-    ).first()
+    save = Save.query.filter_by(id=save_id, user_id=current_user.id).first()
 
     if not save:
         return jsonify({"error": "Save not found"}), 404
-
-    if save.user_id != current_user.id:
-        return jsonify({"error": "Unauthorized"}), 403
 
     db.session.delete(save)
     db.session.commit()

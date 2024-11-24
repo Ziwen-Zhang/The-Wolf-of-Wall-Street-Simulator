@@ -5,12 +5,15 @@ import { thunkLogout } from "../../redux/session";
 import OpenModalMenuItem from "./OpenModalMenuItem";
 import LoginFormModal from "../LoginFormModal";
 import SignupFormModal from "../SignupFormModal";
+import { NavLink, useNavigate } from "react-router-dom";
 
 function ProfileButton() {
   const dispatch = useDispatch();
   const [showMenu, setShowMenu] = useState(false);
   const user = useSelector((store) => store.session.user);
   const ulRef = useRef();
+
+  const navigate = useNavigate();
 
   const toggleMenu = (e) => {
     e.stopPropagation(); // Keep from bubbling up to document and triggering closeMenu
@@ -57,9 +60,12 @@ function ProfileButton() {
         >
           {user ? (
             <>
-              <button className="px-4 py-2 text-center text-green-400 hover:text-yellow-300">
+              <NavLink
+                to="user"
+                className="px-4 py-2 text-center text-green-400 hover:text-yellow-300"
+              >
                 {user.first_name}
-              </button>
+              </NavLink>
               {/* <li className="px-4 py-2 text-green-400 hover:text-yellow-300">
                 {user.email}
               </li> */}

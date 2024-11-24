@@ -6,6 +6,7 @@ import StockDetailPage from "../components/StockPage/StockDetailPage";
 import UserHomePage from "../components/UserHomePage/UserHomePage";
 import HomePageRedirect from "../components/HomePage/HomePageRedirect";
 import MainPage from "../components/HomePage/MainPage";
+import WatchlistPage from "../components/Watchlist/WatchlistPage";
 
 export const router = createBrowserRouter([
   // {
@@ -56,6 +57,10 @@ export const router = createBrowserRouter([
         path: "signup",
         element: <SignupFormPage />,
       },
+      {
+        path:"watchlist",
+        element:<WatchlistPage/>
+      }
     ],
   },
 ]);

@@ -67,7 +67,7 @@ function Saves() {
   const handleDeleteSave = async (saveId) => {
     if (window.confirm("Are you sure you want to delete this save?")) {
       try {
-        await dispatch(deleteSaveThunk(stockId, saveId));
+        await dispatch(deleteSaveThunk(saveId));
       } catch (error) {
         console.error("Failed to delete save:", error);
       }
