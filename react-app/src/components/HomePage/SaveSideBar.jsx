@@ -9,16 +9,16 @@ import {
 } from "../../redux/save";
 
 function Saves() {
-  const { stockId } = useParams(); // 从路由参数中获取 stockId
+  const { stockId } = useParams();
   const dispatch = useDispatch();
 
-  // 从 Redux store 中选择 saves
+
   const saves = useSelector((state) => state.saves.saves || {});
 
-  // 本股票相关的 saves
+
   const relatedSaves = saves[stockId] ? Object.values(saves[stockId]) : [];
 
-  // 输入框和下拉菜单状态
+  
   const [targetPrice, setTargetPrice] = useState("");
   const [alertType, setAlertType] = useState("above");
 
@@ -33,13 +33,12 @@ function Saves() {
         return;
       }
 
-      // 检查是否存在相同 alert_type 的记录
+      
       const existingSave = relatedSaves.find(
         (save) => save.alert_type === alertType
       );
 
       if (existingSave) {
-        // 如果存在相同类型的记录，更新目标价格
         await dispatch(
           updateSaveThunk({
             id: existingSave.id,
@@ -49,7 +48,7 @@ function Saves() {
           })
         );
       } else {
-        // 如果不存在，创建新记录
+
         await dispatch(
           createSave({
             stock_id: stockId,
@@ -59,7 +58,7 @@ function Saves() {
         );
       }
 
-      setTargetPrice(""); // 清空输入框
+      setTargetPrice("");
     } catch (error) {
       console.error("Failed to add or update save:", error);
     }
@@ -105,7 +104,7 @@ function Saves() {
 
         <button
           onClick={handleAddToSaves}
-          className="w-full px-6 py-2 bg-green-500 text-white font-bold rounded shadow-md hover:bg-green-700"
+          className="w-full px-6 py-2 bg-green-500 text-white font-bold rounded shadow-md hover:bg-green-700 active:scale-95 active:bg-green-700 transition-transform duration-150"
         >
           Add to Saves
         </button>

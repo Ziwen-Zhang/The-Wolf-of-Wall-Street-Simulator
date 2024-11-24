@@ -86,6 +86,11 @@ function TradingSideBar() {
     }
   };
 
+  const handleAllin=()=>{
+    dispatch(thunkBuyStock(stock.id, maxBuyQuantity));
+    dispatch(thunkAuthenticate());
+  }
+
   const handleModalClose = () => {
     setShowErrorModal(false);
     setErrorMessage("");
@@ -149,7 +154,7 @@ function TradingSideBar() {
       </div>
       <button
         onClick={handleBuy}
-        className="w-full bg-green-500 text-gray-900 py-2 rounded-md font-bold hover:bg-green-400"
+        className="w-full px-6 py-2 bg-green-500 text-white font-bold rounded shadow-md hover:bg-green-700 active:scale-95 active:bg-green-700 transition-transform duration-150"
       >
         Buy
       </button>
@@ -174,11 +179,16 @@ function TradingSideBar() {
       </div>
       <button
         onClick={handleSell}
-        className="w-full bg-red-500 text-gray-900 py-2 rounded-md font-bold hover:bg-red-400"
+        className="w-full px-6 py-2 bg-red-500 text-white font-bold rounded shadow-md hover:bg-red-700 active:scale-95 active:bg-red-700 transition-transform duration-150"
       >
         Sell
       </button>
+      <button className="w-full px-6 py-2 bg-yellow-400 text-red-700 font-bold rounded shadow-md hover:bg-red-700 hover:text-yellow-400 active:scale-95 active:bg-red-700 transition-transform duration-150"
+      onClick={handleAllin}
+      >
 
+        ALL IN
+      </button>
       {/* Error modal */}
       <ErrorModal
         isVisible={showErrorModal}

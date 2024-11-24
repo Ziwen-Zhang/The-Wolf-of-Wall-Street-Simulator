@@ -55,7 +55,7 @@ function StockDetailPage() {
     }
   }, [allRecords]);
 
-  // New useEffect to monitor data loading
+
   useEffect(() => {
     if (stocks.length > 0 && stockHistory.priceHistory.length > 0) {
       setLoading(false);
@@ -245,7 +245,7 @@ function StockDetailPage() {
                         </div>
                         <div className="flex justify-between">
                           <span className="font-bold text-teal-400">
-                            Earnings Percentage:
+                            Earnings %:
                           </span>
                           <span className={`${earningsColor}`}>
                             {earningsPercentage.toFixed(2)}%

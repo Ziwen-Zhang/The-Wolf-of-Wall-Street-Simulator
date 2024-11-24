@@ -48,6 +48,7 @@ class Usershare(BelongsToStock, BelongsToUser):
     def to_dict(self):
         return {
             "stock_id": self.stock_id,
+            "stock_name":self.stock.name,
             "quantity": self.quantity,
             "average_price": format_currency(self.average_price),
             "current_price":format_currency(self.stock.price),

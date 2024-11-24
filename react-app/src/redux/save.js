@@ -1,10 +1,10 @@
-// Action Types
+
 const LOAD_SAVES = "saves/LOAD_SAVES";
 const ADD_SAVE = "saves/ADD_SAVE";
 const UPDATE_SAVE = "saves/UPDATE_SAVE";
 const DELETE_SAVE = "saves/DELETE_SAVE";
 
-// Action Creators
+
 export const loadSaves = (saves) => ({
   type: LOAD_SAVES,
   saves,
@@ -26,7 +26,7 @@ export const deleteSave = (stockId, saveId) => ({
   saveId,
 });
 
-// Helper function for API requests
+
 const fetchAPI = async (url, options = {}) => {
   const response = await fetch(url, options);
   if (response.ok) {
@@ -37,7 +37,7 @@ const fetchAPI = async (url, options = {}) => {
   }
 };
 
-// Thunk: Fetch all saves
+
 export const fetchSaves = () => async (dispatch) => {
   try {
     const data = await fetchAPI("/api/saves/");
@@ -47,7 +47,7 @@ export const fetchSaves = () => async (dispatch) => {
   }
 };
 
-// Thunk: Create a new save
+
 export const createSave = (saveData) => async (dispatch) => {
   try {
     const data = await fetchAPI("/api/saves/", {
@@ -61,7 +61,6 @@ export const createSave = (saveData) => async (dispatch) => {
   }
 };
 
-// Thunk: Update an existing save
 export const updateSaveThunk = (saveData) => async (dispatch) => {
   try {
     const data = await fetchAPI("/api/saves/", {
@@ -75,7 +74,7 @@ export const updateSaveThunk = (saveData) => async (dispatch) => {
   }
 };
 
-// Thunk: Delete a save
+
 export const deleteSaveThunk = (stockId, saveId) => async (dispatch) => {
   try {
     await fetchAPI("/api/saves/", {
@@ -89,16 +88,15 @@ export const deleteSaveThunk = (stockId, saveId) => async (dispatch) => {
   }
 };
 
-// Initial State
+
 const initialState = {
-  saves: {}, // Key: stock_id, Value: Array of saves
+  saves: {},
 };
 
-// Saves Reducer
+
 const savesReducer = (state = initialState, action) => {
   switch (action.type) {
     case LOAD_SAVES:
-      // Group saves by stock_id
       const groupedSaves = action.saves.reduce((acc, save) => {
         if (!acc[save.stock_id]) {
           acc[save.stock_id] = [];
@@ -112,7 +110,7 @@ const savesReducer = (state = initialState, action) => {
       };
 
     case ADD_SAVE:
-      // Add a new save to the corresponding stock_id
+
       return {
         ...state,
         saves: {
@@ -125,7 +123,7 @@ const savesReducer = (state = initialState, action) => {
       };
 
     case UPDATE_SAVE:
-      // Update an existing save based on its id
+
       return {
         ...state,
         saves: {
@@ -137,7 +135,7 @@ const savesReducer = (state = initialState, action) => {
       };
 
       case DELETE_SAVE: {
-        const { stockId, saveId } = action; // 在块作用域中声明变量
+        const { stockId, saveId } = action;
         return {
           ...state,
           saves: {
