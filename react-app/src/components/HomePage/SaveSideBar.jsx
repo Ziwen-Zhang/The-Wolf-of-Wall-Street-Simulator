@@ -77,7 +77,7 @@ function Saves() {
   };
 
   return (
-    <div className="text-teal-400">
+    <div className="text-teal-400 pt-8">
       <h1 className="text-xl font-bold mb-4 text-center">Add to Watchlist</h1>
 
       <div className="mb-6">
@@ -108,7 +108,7 @@ function Saves() {
           onClick={handleAddToSaves}
           className="w-full px-6 py-2 bg-green-500 text-white font-bold rounded shadow-md hover:bg-green-700 active:scale-95 active:bg-green-700 transition-transform duration-150"
         >
-          Add to Saves
+          Add
         </button>
       </div>
 

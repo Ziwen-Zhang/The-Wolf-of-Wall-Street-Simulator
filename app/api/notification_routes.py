@@ -41,7 +41,7 @@ def create_notification():
     ).first()
 
     if existing_notification:
-        return 
+        return jsonify({"message": "Notification already exists"}), 200
 
     Notification.query.filter_by(
         user_id=current_user.id,

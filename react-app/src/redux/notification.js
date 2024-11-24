@@ -51,8 +51,13 @@ export const postNotificationThunk = (notificationData) => async (dispatch) => {
     });
 
     if (response.ok) {
-      const newNotification = await response.json();
-      dispatch(postNotification(newNotification));
+      const responseData = await response.json();
+
+      if (responseData.message === "Notification already exists") {
+        // console.log("Notification already exists, skipping dispatch.");
+        return; 
+      }
+      dispatch(postNotification(responseData));
     } else {
       console.error("Failed to post notification");
     }
@@ -60,6 +65,7 @@ export const postNotificationThunk = (notificationData) => async (dispatch) => {
     console.error("Error posting notification:", error);
   }
 };
+
 
 export const markNotificationAsReadThunk =
   (notificationId) => async (dispatch) => {

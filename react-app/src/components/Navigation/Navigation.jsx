@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import ProfileButton from "./ProfileButton";
 import { AiOutlineStock } from "react-icons/ai";
 import NotificationDropdown from "./NotificationDropdown";
+import { FaClipboardList } from "react-icons/fa";
 
 function Navigation() {
   return (
@@ -33,6 +34,12 @@ function Navigation() {
           <AiOutlineStock className="w-5 h-5" />
         </NavLink>
         <NotificationDropdown />
+        <NavLink
+          to="watchlist"
+          className="flex items-center p-2 text-green-400 hover:bg-gray-800 hover:text-yellow-400 rounded-md transition-all duration-200"
+        >
+          <FaClipboardList className="w-5 h-5" />
+        </NavLink>
       </div>
         
       {/* user i */}

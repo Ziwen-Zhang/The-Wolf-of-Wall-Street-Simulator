@@ -7,6 +7,7 @@ import UserHomePage from "../components/UserHomePage/UserHomePage";
 import HomePageRedirect from "../components/HomePage/HomePageRedirect";
 import MainPage from "../components/HomePage/MainPage";
 import WatchlistPage from "../components/Watchlist/WatchlistPage";
+import OwnedStocksPage from "../components/UserHomePage/UserSharesPage";
 
 export const router = createBrowserRouter([
   // {
