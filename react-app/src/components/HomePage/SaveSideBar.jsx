@@ -7,6 +7,7 @@ import {
   updateSaveThunk,
   deleteSaveThunk,
 } from "../../redux/save";
+import { fetchNotifications } from "../../redux/notification";
 
 function Saves() {
   const { stockId } = useParams();
@@ -68,6 +69,7 @@ function Saves() {
     if (window.confirm("Are you sure you want to delete this save?")) {
       try {
         await dispatch(deleteSaveThunk(saveId));
+        await dispatch(fetchNotifications())
       } catch (error) {
         console.error("Failed to delete save:", error);
       }

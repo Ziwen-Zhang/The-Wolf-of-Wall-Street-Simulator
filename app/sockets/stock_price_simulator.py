@@ -2,7 +2,7 @@ from time import sleep
 from app.models import Stock,User,Usershare
 import random
 
-def stock_price_simulator(socketio):
+def stock_price_simulator():
     from app import app, db
     while True:
         try:
@@ -39,7 +39,7 @@ def stock_price_simulator(socketio):
                         "symbol":stock.symbol
                     }
                     updated_stocks.append(stock_data)
-                    socketio.emit("stock_update", stock_data, room=str(stock.id))
+                    # socketio.emit("stock_update", stock_data, room=str(stock.id))
 
                 affected_users = (
                     db.session.query(User)

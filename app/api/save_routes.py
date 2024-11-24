@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.models import User, db, Save
+from app.models import Notification, Stock, User, db, Save
 from flask_login import current_user, login_required
 
 save_routes = Blueprint("save", __name__)
@@ -103,21 +103,24 @@ def edit_save():
 
 #     return jsonify({"message": "Save deleted successfully"}), 200
 
-@save_routes.route("/", methods=["DELETE"])
+@save_routes.route("/<int:id>", methods=["DELETE"])
 @login_required
-def delete_save():
-    data = request.get_json()
-    save_id = data.get("id")
+def delete_save(id):
 
-    if not save_id:
-        return jsonify({"error": "Save ID is required"}), 400
+    save = Save.query.get(id)
 
-    save = Save.query.filter_by(id=save_id, user_id=current_user.id).first()
-
-    if not save:
+    if not save or save.user_id != current_user.id:
         return jsonify({"error": "Save not found"}), 404
+    stock = Stock.query.get(save.stock_id)  
+    
+    Notification.query.filter_by(
+        user_id=current_user.id,
+        stock_name=stock.name, 
+        alert_type=save.alert_type
+    ).delete()
 
     db.session.delete(save)
     db.session.commit()
 
-    return jsonify({"message": "Save deleted successfully"}), 200
+    return jsonify({"message": f"Save {id} and related {save.alert_type} notifications deleted"}), 200
+

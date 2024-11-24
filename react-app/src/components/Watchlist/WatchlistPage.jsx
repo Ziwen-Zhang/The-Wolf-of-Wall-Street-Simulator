@@ -7,8 +7,10 @@ import {
   createSave,
 } from "../../redux/save";
 import { thunkGetStocks, startStockUpdates } from "../../redux/stock";
+import { useNotificationChecker } from "../Hook/useNotificationChecker";
 
 function WatchlistPage() {
+    useNotificationChecker()
   const dispatch = useDispatch();
   const saves = useSelector((state) => state.saves.saves);
   const stocks = useSelector((state) => state.stock.stocks);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setStockRecords, startStockUpdates } from "../../redux/stock";
+import { setStockRecords, startStockUpdates, thunkGetOneStock } from "../../redux/stock";
 import { Line } from "react-chartjs-2";
 import { useParams } from "react-router-dom";
 import {
@@ -15,6 +15,7 @@ import {
 } from "chart.js";
 import StockSideBar from "../HomePage/StockSideBar";
 import TradingSideBar from "../HomePage/TradingSideBar"
+import { postNotificationThunk } from "../../redux/notification";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -24,6 +25,7 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+import { useNotificationChecker } from "../Hook/useNotificationChecker"
 
 function StockDetailPage() {
   const { stockId } = useParams();
@@ -31,11 +33,48 @@ function StockDetailPage() {
   const [loading, setLoading] = useState(true);
   const stocks = useSelector((state) => state.stock.stocks);
   const allRecords = useSelector((state) => state.stock.allRecords);
+  // const saves = useSelector((state)=>state.saves.saves)
   const stock = stocks.find((s) => s.id === Number(stockId));
   const stockHistory = allRecords[String(stockId)] || {
     priceHistory: [],
     timestamps: [],
   };
+
+  useNotificationChecker()
+  // const savedStocks = stocks.filter((stock) =>
+  //   Object.keys(saves).some((stockId) =>
+  //     saves[stockId].some((save) => save.stock_id === stock.id)
+  //   )
+  // );
+
+  // useEffect(() => {
+  //   savedStocks.forEach((stock) => {
+  //     const stockId = stock.id;
+  //     const stockSaves = saves[stockId] || []; 
+  
+  //     stockSaves.forEach((save) => {
+  //       const targetPrice = parseFloat(save.target_price);
+  //       const alertType = save.alert_type;
+  //       const price = stock.price; 
+  
+  //       if (
+  //         (alertType === "above" && price >= targetPrice) ||
+  //         (alertType === "below" && price <= targetPrice)
+  //       ) {
+  //         dispatch(
+  //           postNotificationThunk({
+  //             stock_name: stock.name,
+  //             target_price: targetPrice,
+  //             current_price: price,
+  //             alert_type: alertType,
+  //           })
+  //         );
+  //       }
+  //     });
+  //   });
+  // }, [savedStocks, saves, dispatch]);
+  
+
 
   const user = useSelector((state) => state.session.user);
   const ownedShares = useSelector((state) => state.ownedShares.ownedShares);

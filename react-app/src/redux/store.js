@@ -9,12 +9,14 @@ import sessionReducer from "./session";
 import stockReducer from "./stock";
 import ownedSharesReducer from "./ownedshares";
 import savesReducer from "./save";
+import { notificationReducer } from "./notification";
 
 const rootReducer = combineReducers({
   session: sessionReducer,
   stock:stockReducer,
   ownedShares:ownedSharesReducer,
-  saves:savesReducer
+  saves:savesReducer,
+  notifications:notificationReducer,
 });
 
 let enhancer;

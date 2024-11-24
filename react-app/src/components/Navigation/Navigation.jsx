@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import ProfileButton from "./ProfileButton";
 import { AiOutlineStock } from "react-icons/ai";
+import NotificationDropdown from "./NotificationDropdown";
 
 function Navigation() {
   return (
@@ -31,8 +32,9 @@ function Navigation() {
         >
           <AiOutlineStock className="w-5 h-5" />
         </NavLink>
+        <NotificationDropdown />
       </div>
-
+        
       {/* user i */}
       <div className="flex items-center space-x-4">
         <ProfileButton />

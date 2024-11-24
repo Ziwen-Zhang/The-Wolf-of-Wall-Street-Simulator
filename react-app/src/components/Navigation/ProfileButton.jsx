@@ -40,6 +40,7 @@ function ProfileButton() {
     e.preventDefault();
     dispatch(thunkLogout());
     closeMenu();
+    navigate("/stocks/1")
   };
 
   return (

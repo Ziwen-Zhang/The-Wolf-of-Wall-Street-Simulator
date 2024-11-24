@@ -15,6 +15,7 @@ import {
 } from "chart.js";
 import { thunkGetStocks } from "../../redux/stock";
 import StockSideBar from "../HomePage/StockSideBar";
+import { useNotificationChecker } from "../Hook/useNotificationChecker";
 
 ChartJS.register(
   CategoryScale,
@@ -31,9 +32,9 @@ function UserHomePage() {
   const user = useSelector((state) => state.session.user);
   const [loanAmount, setLoanAmount] = useState(0);
   const [repayAmount, setRepayAmount] = useState(0);
-  const [maxloan, setMaxloan] = useState(1000000 - user.bank_debt);
-  const [maxRepay, setMaxRepay] = useState(user.bank_debt);
-
+  const [maxloan, setMaxloan] = useState(0);
+  const [maxRepay, setMaxRepay] = useState(0);
+  useNotificationChecker()
   useEffect(() => {
     if (user) {
       setMaxloan(1000000 - user.bank_debt);
@@ -129,7 +130,7 @@ function UserHomePage() {
   };
 
   const lineColor =
-    user.total_net_worth >= initialNetWorth + user.bank_debt
+    user.total_net_worth >= initialNetWorth 
       ? "rgba(0, 255, 0, 1)"
       : "rgba(255, 0, 0, 1)";
 
@@ -171,8 +172,8 @@ function UserHomePage() {
     },
   };
 
-  const totalEarnings = user.total_net_worth - initialNetWorth - user.bank_debt;
-  const earningsPercentage = (totalEarnings / user.total_net_worth) * 100;
+  const totalEarnings = user.total_net_worth - initialNetWorth;
+  const earningsPercentage = (totalEarnings / (user.total_net_worth + user.bank_debt)) * 100;
 
   return (
     <div className="flex">
@@ -180,7 +181,7 @@ function UserHomePage() {
       <div className="p-4 w-3/4 bg-gray-800 text-white shadow-md max-h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold mb-2 text-teal-400">Investing</h1>
         <p className="text-xl font-semibold" style={{ color: lineColor }}>
-          $ {user.total_net_worth}
+          $ {user.total_net_worth + user.bank_debt}
         </p>
         <div className="bg-gray-900 p-4 rounded-lg shadow-lg w-full h-64 sm:h-96">
           <Line data={data} options={options} />

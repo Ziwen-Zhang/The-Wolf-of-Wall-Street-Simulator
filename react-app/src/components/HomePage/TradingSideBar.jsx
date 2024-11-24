@@ -5,6 +5,7 @@ import { thunkAuthenticate } from "../../redux/session";
 import ErrorModal from "../ErrorModal/ErrorModal";
 import { useParams } from "react-router-dom";
 import Saves from "./SaveSideBar";
+import { thunkGetStocks } from "../../redux/stock";
 
 function TradingSideBar() {
   const { stockId } = useParams();
@@ -72,6 +73,7 @@ function TradingSideBar() {
     } else {
       dispatch(thunkBuyStock(stock.id, buyQuantity));
       dispatch(thunkAuthenticate());
+      dispatch(thunkGetStocks())
     }
   };
 
@@ -81,6 +83,7 @@ function TradingSideBar() {
       setShowErrorModal(true);
     } else {
       dispatch(thunkSellStock(stock.id, sellQuantity));
+      dispatch(thunkGetStocks())
       dispatch(thunkAuthenticate());
       setSellQuantity(1)
     }
@@ -89,6 +92,7 @@ function TradingSideBar() {
   const handleAllin=()=>{
     dispatch(thunkBuyStock(stock.id, maxBuyQuantity));
     dispatch(thunkAuthenticate());
+    dispatch(thunkGetStocks())
   }
 
   const handleModalClose = () => {

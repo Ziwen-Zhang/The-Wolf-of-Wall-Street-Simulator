@@ -10,6 +10,7 @@ from .api.auth_routes import auth_routes
 from .api.stock_routes import stocks_routes
 from .api.save_routes import save_routes
 from .api.transaction_routes import transactions_routes
+from .api.notification_routes import notification_routes
 from .seeds import seed_commands
 from .config import Config
 from threading import Thread
@@ -39,6 +40,7 @@ app.register_blueprint(auth_routes, url_prefix="/api/auth")
 app.register_blueprint(stocks_routes, url_prefix="/api/stocks")
 app.register_blueprint(save_routes, url_prefix="/api/saves")
 app.register_blueprint(transactions_routes, url_prefix="/api/transactions")
+app.register_blueprint(notification_routes, url_prefix="/api/notification")
 db.init_app(app)
 Migrate(app, db)
 
@@ -71,7 +73,9 @@ def handle_leave_stock_room(stock_id):
     leave_room(stock_id)
     print(f"Client left room for stock {stock_id}")
 
-random_price_thread = Thread(target=stock_price_simulator, args=(socketio,), daemon=True)
+# random_price_thread = Thread(target=stock_price_simulator, args=(socketio,), daemon=True)
+random_price_thread = Thread(target=stock_price_simulator, daemon=True)
+
 random_price_thread.start()
 
 # limit_order_thread = Thread(target=process_orders, daemon=True)

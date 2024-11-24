@@ -10,3 +10,4 @@ from .Save import Save
 from .Transaction import Transaction
 from .Leaderboard import Leaderboard
 from .Order import Order
+from .Notification import Notification

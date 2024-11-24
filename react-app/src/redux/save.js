@@ -77,12 +77,13 @@ export const updateSaveThunk = (saveData) => async (dispatch) => {
 
 export const deleteSaveThunk = (saveId) => async (dispatch) => {
   try {
-    await fetchAPI("/api/saves/", {
+    await fetchAPI(`/api/saves/${saveId}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: saveId }),
     });
+    
     dispatch(deleteSave(saveId));
+
   } catch (error) {
     console.error("Failed to delete save:", error);
   }
