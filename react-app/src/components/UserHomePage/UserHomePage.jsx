@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { thunkAuthenticate } from "../../redux/session"; // 确保导入正确的 action
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -11,6 +12,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { thunkGetStocks } from "../../redux/stock";
+import StockSideBar from "../HomePage/StockSideBar";
 
 ChartJS.register(
   CategoryScale,
@@ -33,7 +36,17 @@ function UserHomePage() {
 
   useEffect(() => {
     if (user) {
+      const refreshInterval = setInterval(() => {
+        dispatch(thunkAuthenticate());
+        dispatch(thunkGetStocks())
+      }, 3000); 
 
+      return () => clearInterval(refreshInterval);
+    }
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    if (user) {
       const interval = setInterval(() => {
         setInvestingHistory((prevState) => {
           const now = new Date().toLocaleTimeString();
@@ -76,6 +89,7 @@ function UserHomePage() {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: false,
@@ -98,15 +112,20 @@ function UserHomePage() {
   };
 
   return (
-    <div className="flex flex-col bg-gray-900 text-white">
-      {/* Investing Section */}
-      <div className="flex-grow bg-gray-800 p-6 rounded-md shadow-md mb-2">
-        <h1 className="text-3xl font-bold text-yellow-300 mb-4">Investing</h1>
+    <div className="flex">
+      <StockSideBar />
+    <div className="p-4 w-3/4 bg-gray-800 text-white shadow-md max-h-screen overflow-y-auto">
+      <h1 className="text-2xl font-bold mb-4 text-teal-400">
+        Investing
+      </h1>
+      <div className="bg-gray-900 p-4 rounded-lg shadow-lg w-full h-64 sm:h-96">
         <Line data={data} options={options} />
       </div>
       {/* Buying Power Section */}
-      <div className="bg-gray-800 p-6 rounded-md shadow-md">
-        <h2 className="text-2xl font-semibold text-yellow-300 mb-2">Buying Power</h2>
+      <div className="grid mt-4">
+        <h2 className="text-2xl font-semibold text-yellow-300 mb-2">
+          Buying Power
+        </h2>
         <div className="text-gray-300">
           <span className="text-lg font-bold text-teal-400">Available: </span>
           <span className="text-gray-200 text-xl">
@@ -114,9 +133,14 @@ function UserHomePage() {
           </span>
         </div>
         <div>
-            <span className="font-bold text-teal-400">Bank Debt: </span>
-            <span className="text-gray-200">${user.bank_debt.toFixed(2)}</span>
-          </div>
+          <span className="font-bold text-teal-400">Bank Debt: </span>
+          <span className="text-gray-200">${user.bank_debt.toFixed(2)}</span>
+        </div>
+        <div>
+          <span className="font-bold text-teal-400">Total Net Worth: </span>
+          <span className="text-gray-200">${user.total_net_worth.toFixed(2)}</span>
+        </div>
+      </div>
       </div>
     </div>
   );

@@ -13,7 +13,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-
+import StockSideBar from "../HomePage/StockSideBar";
+import TradingSideBar from "../HomePage/TradingSideBar"
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -117,146 +118,155 @@ function StockDetailPage() {
     },
   };
 
-
   return (
-    <div className="p-8 h-screen bg-gray-800 text-gray-300 text-left">
-      <h1 className="text-2xl font-bold mb-4 text-teal-400">
-        {stock.name} ({stock.symbol})
-        <p className="text-xl font-semibold" style={{ color: lineColor }}>
-          ${stock.price}
-        </p>
-      </h1>
+    <div className="flex">
+      <StockSideBar />
+      <div className="p-8 h-screen bg-gray-800 text-gray-300 w-2/4 border-2 border-gray-900">
+        <h1 className="text-2xl font-bold mb-4 text-teal-400">
+          {stock.name} ({stock.symbol})
+          <p className="text-xl font-semibold" style={{ color: lineColor }}>
+            ${stock.price}
+          </p>
+        </h1>
 
-      <div className="bg-gray-900 p-4 rounded-lg shadow-lg w-full h-64 sm:h-96">
-        <Line data={data} options={options} />
-      </div>
-      <div className="grid mt-4">
-        <h2 className="text-lg font-semibold text-teal-400">
-          About {stock.name}
-        </h2>
-        <div className="text-gray-400 mb-4">{stock.description}</div>
-        <div className="flex text-lg mb-4 font-semibold text-teal-400">
-          <div className="w-1/2 text-center">Stats</div>
-          <div className="w-1/2 text-center">Owned Shares</div>
+        <div className="bg-gray-900 p-4 rounded-lg shadow-lg w-full h-64 sm:h-96">
+          <Line data={data} options={options} />
         </div>
-        <div className="flex">
-          <div className="w-1/2 space-y-2 px-16">
-            {/* Stats Section */}
-            <div className="space-y-8">
-              <div className="flex justify-between">
-                <span className="font-bold text-teal-400">Initial Price:</span>{" "}
-                <span className="text-green-500">
-                  ${stock.initial_price.toFixed(2)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-bold text-teal-400">Current Price:</span>{" "}
-                <span className="text-green-500">
-                  ${stock.price.toFixed(2)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-bold text-teal-400">Change:</span>{" "}
-                <span
-                  className={
-                    stock.price > stock.initial_price
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }
-                >
-                  {(
-                    ((stock.price - stock.initial_price) /
-                      stock.initial_price) *
-                    100
-                  ).toFixed(2)}
-                  %
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-bold text-teal-400">Highest Today:</span>{" "}
-                <span className="text-yellow-400">
-                  ${Math.max(...stockHistory.priceHistory).toFixed(2)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-bold text-teal-400">Lowest Today:</span>{" "}
-                <span className="text-red-400">
-                  ${Math.min(...stockHistory.priceHistory).toFixed(2)}
-                </span>
+        <div className="grid mt-4">
+          <h2 className="text-lg  text-teal-400">
+            About {stock.name}
+          </h2>
+          <div className="text-gray-400 mb-4">{stock.description}</div>
+          <div className="flex text-lg mb-4 font-semibold text-teal-400">
+            <div className="w-1/2 text-center">Stats</div>
+            <div className="w-1/2 text-center">Owned Shares</div>
+          </div>
+          <div className="flex">
+            <div className="w-1/2 px-4">
+              {/* Stats Section */}
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="font-bold text-teal-400">
+                    Initial Price:
+                  </span>{" "}
+                  <span className="text-green-500">
+                    ${stock.initial_price.toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-bold text-teal-400">
+                    Current Price:
+                  </span>{" "}
+                  <span className="text-green-500">
+                    ${stock.price.toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-bold text-teal-400">Change:</span>{" "}
+                  <span
+                    className={
+                      stock.price > stock.initial_price
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }
+                  >
+                    {(
+                      ((stock.price - stock.initial_price) /
+                        stock.initial_price) *
+                      100
+                    ).toFixed(2)}
+                    %
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-bold text-teal-400">
+                    Highest Today:
+                  </span>{" "}
+                  <span className="text-yellow-400">
+                    ${Math.max(...stockHistory.priceHistory).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-bold text-teal-400">Lowest Today:</span>{" "}
+                  <span className="text-red-400">
+                    ${Math.min(...stockHistory.priceHistory).toFixed(2)}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="w-1/2 space-y-2 px-16">
-            {!user ? (
-              <div className="text-red-500 text-center">
-                You need to log in to view this section.
-              </div>
-            ) : (
-              (() => {
-                const ownedShare = ownedShares.find(
-                  (share) => share.stock_id === stock.id
-                );
-                if (ownedShare) {
-                  const earnings =
-                    ownedShare.total_value -
-                    ownedShare.quantity * ownedShare.average_price;
-                  const earningsPercentage =
-                    (earnings /
-                      (ownedShare.quantity * ownedShare.average_price)) *
-                    100;
-                  const earningsColor =
-                    earnings >= 0 ? "text-green-500" : "text-red-500";
+            <div className="w-1/2 px-4">
+              {!user ? (
+                <div className="text-red-500 text-center">
+                  You need to log in to view this section.
+                </div>
+              ) : (
+                (() => {
+                  const ownedShare = ownedShares.find(
+                    (share) => share.stock_id === stock.id
+                  );
+                  if (ownedShare) {
+                    const earnings =
+                      ownedShare.total_value -
+                      ownedShare.quantity * ownedShare.average_price;
+                    const earningsPercentage =
+                      (earnings /
+                        (ownedShare.quantity * ownedShare.average_price)) *
+                      100;
+                    const earningsColor =
+                      earnings >= 0 ? "text-green-500" : "text-red-500";
 
-                  return (
-                    <div className="text-gray-400 space-y-8">
-                      <div className="flex justify-between">
-                        <span className="font-bold text-teal-400">
-                          Quantity:
-                        </span>
-                        <span>{ownedShare.quantity.toFixed(2)}</span>
+                    return (
+                      <div className="text-gray-400 space-y-4">
+                        <div className="flex justify-between">
+                          <span className="font-bold text-teal-400">
+                            Quantity:
+                          </span>
+                          <span>{ownedShare.quantity.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-bold text-teal-400">
+                            Average Price:
+                          </span>
+                          <span>${ownedShare.average_price.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-bold text-teal-400">
+                            Total Value:
+                          </span>
+                          <span>${ownedShare.total_value.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-bold text-teal-400">
+                            Total Earnings:
+                          </span>
+                          <span className={`${earningsColor}`}>
+                            ${earnings.toFixed(2)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-bold text-teal-400">
+                            Earnings Percentage:
+                          </span>
+                          <span className={`${earningsColor}`}>
+                            {earningsPercentage.toFixed(2)}%
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="font-bold text-teal-400">
-                          Average Price:
-                        </span>
-                        <span>${ownedShare.average_price.toFixed(2)}</span>
+                    );
+                  } else {
+                    return (
+                      <div className="text-gray-500 text-center">
+                        You do not own any shares of this stock.
                       </div>
-                      <div className="flex justify-between">
-                        <span className="font-bold text-teal-400">
-                          Total Value:
-                        </span>
-                        <span>${ownedShare.total_value.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-bold text-teal-400">
-                          Total Earnings:
-                        </span>
-                        <span className={`${earningsColor}`}>
-                          ${earnings.toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-bold text-teal-400">
-                          Earnings Percentage:
-                        </span>
-                        <span className={`${earningsColor}`}>
-                          {earningsPercentage.toFixed(2)}%
-                        </span>
-                      </div>
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div className="text-gray-500 text-center">
-                      You do not own any shares of this stock.
-                    </div>
-                  );
-                }
-              })()
-            )}
+                    );
+                  }
+                })()
+              )}
+            </div>
           </div>
         </div>
       </div>
+      <TradingSideBar/>
     </div>
   );
 }

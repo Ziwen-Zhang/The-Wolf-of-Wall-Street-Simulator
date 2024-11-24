@@ -1,17 +1,15 @@
-from flask import Blueprint, request,jsonify
-from app.models import User, db , Save
-from app.forms import LoginForm
-from app.forms import SignUpForm
-from flask_login import current_user, login_user, logout_user, login_required
+from flask import Blueprint, request, jsonify
+from app.models import User, db, Save
+from flask_login import current_user, login_required
 
 save_routes = Blueprint("save", __name__)
 
 
 @save_routes.route("/")
 def get_all_saves():
-    saves = Save.query.filter_by(user_id = current_user.id)
+    saves = Save.query.filter_by(user_id=current_user.id)
     save_list = [s.to_dict() for s in saves]
-    return jsonify({"saves":save_list})
+    return jsonify({"saves": save_list})
 
 
 @save_routes.route("/", methods=["POST"])
@@ -27,16 +25,19 @@ def add_save():
 
     if alert_type not in ["above", "below"]:
         return jsonify({"error": "Invalid alert type"}), 400
-    
-    existing_save = Save.query.filter_by(stock_id=stock_id, user_id=current_user.id).first()
+
+    existing_save = Save.query.filter_by(
+        stock_id=stock_id, user_id=current_user.id, alert_type=alert_type
+    ).first()
+
     if existing_save:
-        return jsonify({"error": "Stock already saved"}), 400
+        return jsonify({"error": f"Stock already has a '{alert_type}' alert"}), 400
 
     new_save = Save(
         stock_id=stock_id,
         user_id=current_user.id,
         target_price=target_price,
-        alert_type=alert_type
+        alert_type=alert_type,
     )
     db.session.add(new_save)
     db.session.commit()
@@ -59,16 +60,18 @@ def edit_save():
     if alert_type is not None and alert_type not in ["above", "below"]:
         return jsonify({"error": "Invalid alert type"}), 400
 
-    save = Save.query.filter_by(stock_id=stock_id, user_id=current_user.id).first()
+    save = Save.query.filter_by(
+        stock_id=stock_id, user_id=current_user.id, alert_type=alert_type
+    ).first()
+
     if not save:
         return jsonify({"error": "Save not found"}), 404
 
     if save.user_id != current_user.id:
         return jsonify({"error": "Unauthorized"}), 403
+
     if target_price is not None:
         save.target_price = target_price
-    if alert_type is not None:
-        save.alert_type = alert_type
 
     db.session.commit()
 
@@ -80,7 +83,17 @@ def edit_save():
 def delete_save():
     data = request.get_json()
     stock_id = data.get("stock_id")
-    save = Save.query.filter_by(stock_id=stock_id, user_id=current_user.id).first()
+    alert_type = data.get("alert_type")
+
+    if not alert_type or alert_type not in ["above", "below"]:
+        return jsonify({"error": "Invalid alert type"}), 400
+
+    save = Save.query.filter_by(
+        stock_id=stock_id, user_id=current_user.id, alert_type=alert_type
+    ).first()
+
+    if not save:
+        return jsonify({"error": "Save not found"}), 404
 
     if save.user_id != current_user.id:
         return jsonify({"error": "Unauthorized"}), 403

@@ -1,14 +1,20 @@
 const SET_USER = 'session/setUser';
 const REMOVE_USER = 'session/removeUser';
 
-const setUser = (user) => ({
-  type: SET_USER,
-  payload: user
-});
+const setUser = (user) => {
+  localStorage.setItem("user", JSON.stringify(user));
+  return {
+    type: SET_USER,
+    payload: user,
+  };
+};
 
-const removeUser = () => ({
-  type: REMOVE_USER
-});
+const removeUser = () => {
+  localStorage.removeItem("user");
+  return {
+    type: REMOVE_USER,
+  };
+};
 
 export const thunkAuthenticate = () => async (dispatch) => {
 	const response = await fetch("/api/auth/");
@@ -48,7 +54,6 @@ export const thunkSignup = (user) => async (dispatch) => {
     body: JSON.stringify(user)
   
   });
-  console.log(response)
   if(response.ok) {
     const data = await response.json();
     dispatch(setUser(data));
@@ -67,7 +72,9 @@ export const thunkLogout = () => async (dispatch) => {
   dispatch(removeUser());
 };
 
-const initialState = { user: null };
+const initialState = {
+  user: JSON.parse(localStorage.getItem("user")) || null, // Restore user
+};
 
 function sessionReducer(state = initialState, action) {
   switch (action.type) {

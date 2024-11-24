@@ -76,36 +76,35 @@ function stockReducer(state = initialState, action) {
         stocks: action.payload.stocks,
       };
 
-    case SET_STOCK_RECORDS: {
-      const updatedRecords = { ...state.allRecords };
-
-      action.payload.stocks.forEach((stock) => {
-        const id = String(stock.id); 
-        if (!updatedRecords[id]) {
-          updatedRecords[id] = {
-            priceHistory: [],
-            timestamps: [],
-            name: stock.name,
-            symbol: stock.symbol,
-            description: stock.description,
-          };
-        }
+      case SET_STOCK_RECORDS: {
+        const updatedRecords = { ...state.allRecords };
       
-        updatedRecords[id].priceHistory.push(stock.price);
-        updatedRecords[id].timestamps.push(new Date().toLocaleTimeString());
+        action.payload.stocks.forEach((stock) => {
+          const id = String(stock.id);
+          if (!updatedRecords[id]) {
+            updatedRecords[id] = {
+              priceHistory: [],
+              timestamps: [],
+              name: stock.name,
+              symbol: stock.symbol,
+              description: stock.description,
+            };
+          }
       
-        if (updatedRecords[id].priceHistory.length > 500) {
-          updatedRecords[id].priceHistory.shift();
-          updatedRecords[id].timestamps.shift();
-        }
-      });
+          updatedRecords[id].priceHistory.push(stock.price);
+          updatedRecords[id].timestamps.push(new Date().toLocaleTimeString());
       
-
-      return {
-        ...state,
-        allRecords: updatedRecords
-      };
-    }
+          if (updatedRecords[id].priceHistory.length > 500) {
+            updatedRecords[id].priceHistory.shift();
+            updatedRecords[id].timestamps.shift();
+          }
+        });
+      
+        return {
+          ...state,
+          allRecords: updatedRecords,
+        };
+      }
 
     default:
       return state;

@@ -26,7 +26,7 @@ function Navigation() {
         />
         {/* i */}
         <NavLink
-          to="/"
+          to="stocks/1"
           className="flex items-center p-2 text-green-400 hover:bg-gray-800 hover:text-yellow-400 rounded-md transition-all duration-200"
         >
           <AiOutlineStock className="w-5 h-5" />

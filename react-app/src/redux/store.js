@@ -8,11 +8,13 @@ import thunk from "redux-thunk";
 import sessionReducer from "./session";
 import stockReducer from "./stock";
 import ownedSharesReducer from "./ownedshares";
+import savesReducer from "./save";
 
 const rootReducer = combineReducers({
   session: sessionReducer,
   stock:stockReducer,
-  ownedShares:ownedSharesReducer
+  ownedShares:ownedSharesReducer,
+  saves:savesReducer
 });
 
 let enhancer;

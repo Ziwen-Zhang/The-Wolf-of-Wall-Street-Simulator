@@ -5,14 +5,48 @@ import Layout from "./Layout";
 import StockDetailPage from "../components/StockPage/StockDetailPage";
 import UserHomePage from "../components/UserHomePage/UserHomePage";
 import HomePageRedirect from "../components/HomePage/HomePageRedirect";
+import MainPage from "../components/HomePage/MainPage";
 
 export const router = createBrowserRouter([
+  // {
+  //   element: <Layout />,
+  //   children: [
+  //     {
+  //       path: "/",
+  //       element: <HomePageRedirect />,
+  //     },
+  //     {
+  //       path: "login",
+  //       element: <LoginFormPage />,
+  //     },
+  //     {
+  //       path: "signup",
+  //       element: <SignupFormPage />,
+  //     },
+  //     {
+  //       path: "/stocks/:stockId",
+  //       element: <StockDetailPage />,
+  //     },
+  //     {
+  //       path: "/user",
+  //       element: <UserHomePage />,
+  //     },
+  //   ],
+  // },
   {
-    element: <Layout />,
+    element: <Layout />, 
     children: [
       {
-        path: "/",
-        element: <HomePageRedirect />,
+        path:"/",
+        element:<MainPage/>
+      },
+      {
+        path: "/stocks/:stockId",
+        element: <StockDetailPage />, 
+      },
+      {
+        path: "/user",
+        element: <UserHomePage />,
       },
       {
         path: "login",
@@ -21,14 +55,6 @@ export const router = createBrowserRouter([
       {
         path: "signup",
         element: <SignupFormPage />,
-      },
-      {
-        path: "/stocks/:stockId",
-        element: <StockDetailPage />,
-      },
-      {
-        path: "user",
-        element: <UserHomePage />,
       },
     ],
   },

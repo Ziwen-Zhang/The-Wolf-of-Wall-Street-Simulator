@@ -15,7 +15,8 @@ function HomePageRedirect() {
     }
     if (user) {
       navigate('/user');
-    } else if (stocks.length > 0) {
+    }
+     else if (stocks.length > 0) {
       const firstStockId = stocks[0].id;
       navigate(`/stocks/${firstStockId}`);
     }
