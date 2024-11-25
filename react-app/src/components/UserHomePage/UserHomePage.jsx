@@ -36,14 +36,14 @@ function UserHomePage() {
   const [loanAmount, setLoanAmount] = useState(0);
   const [repayAmount, setRepayAmount] = useState(0);
   const [maxloan, setMaxloan] = useState(0);
-  const [maxRepay, setMaxRepay] = useState(0);
+  // const [maxRepay, setMaxRepay] = useState(0);
 
   // const initialNetWorth = 100000;
 
   useEffect(() => {
     if (user) {
       setMaxloan(1000000 - user.bank_debt);
-      setMaxRepay(user.bank_debt);
+      // setMaxRepay(user.bank_debt);
     }
   }, [user]);
 

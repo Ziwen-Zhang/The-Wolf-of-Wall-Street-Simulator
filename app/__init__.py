@@ -15,10 +15,10 @@ from .seeds import seed_commands
 from .config import Config
 from threading import Thread
 from .sockets.simulate_transactions import simulate_transactions
-from .sockets.save_notification import process_save_notifications
+# from .sockets.save_notification import process_save_notifications
 from .sockets.stock_price_simulator import stock_price_simulator
 from .sockets.trigger_limit_order import process_orders
-from flask_socketio import SocketIO, emit, join_room, leave_room
+# from flask_socketio import SocketIO, emit, join_room, leave_room
 
 app = Flask(__name__, static_folder="../react-app/dist", static_url_path="/")
 app.json.sort_keys = False
@@ -49,29 +49,29 @@ CORS(app)
 
 # websocket
 
-socketio = SocketIO(app, cors_allowed_origins="*")
+# socketio = SocketIO(app, cors_allowed_origins="*")
 
 # if __name__ == "__main__":
 #     socketio.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
 
-@socketio.on("connect")
-def handle_connect():
-    print("Client connected")
+# @socketio.on("connect")
+# def handle_connect():
+#     print("Client connected")
 
-@socketio.on("disconnect")
-def handle_disconnect():
-    print("Client disconnected")
+# @socketio.on("disconnect")
+# def handle_disconnect():
+#     print("Client disconnected")
 
-@socketio.on("join_stock_room")
-def handle_join_stock_room(stock_id):
-    join_room(stock_id)
-    print(f"Client joined room for stock {stock_id}")
+# @socketio.on("join_stock_room")
+# def handle_join_stock_room(stock_id):
+#     join_room(stock_id)
+#     print(f"Client joined room for stock {stock_id}")
 
-@socketio.on("leave_stock_room")
-def handle_leave_stock_room(stock_id):
-    leave_room(stock_id)
-    print(f"Client left room for stock {stock_id}")
+# @socketio.on("leave_stock_room")
+# def handle_leave_stock_room(stock_id):
+#     leave_room(stock_id)
+#     print(f"Client left room for stock {stock_id}")
 
 # random_price_thread = Thread(target=stock_price_simulator, args=(socketio,), daemon=True)
 random_price_thread = Thread(target=stock_price_simulator, daemon=True)
