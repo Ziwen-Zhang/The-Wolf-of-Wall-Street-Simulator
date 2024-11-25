@@ -74,9 +74,9 @@ CORS(app)
 #     print(f"Client left room for stock {stock_id}")
 
 # random_price_thread = Thread(target=stock_price_simulator, args=(socketio,), daemon=True)
-random_price_thread = Thread(target=stock_price_simulator, daemon=True)
+# random_price_thread = Thread(target=stock_price_simulator, daemon=True)
 
-random_price_thread.start()
+# random_price_thread.start()
 
 # limit_order_thread = Thread(target=process_orders, daemon=True)
 # limit_order_thread.start()
