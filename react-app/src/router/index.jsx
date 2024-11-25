@@ -7,6 +7,7 @@ import UserHomePage from "../components/UserHomePage/UserHomePage";
 import MainPage from "../components/HomePage/MainPage";
 import WatchlistPage from "../components/Watchlist/WatchlistPage";
 import OrderHistoryPage from "../components/UserHomePage/OrderHistoryPage";
+import Leaderboard from "../components/HomePage/LeaderBoard";
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ export const router = createBrowserRouter([
       {
         path:"history",
         element:<OrderHistoryPage/>
+      },
+      {
+        path:"leaderboard",
+        element:<Leaderboard/>
       }
     ],
   },

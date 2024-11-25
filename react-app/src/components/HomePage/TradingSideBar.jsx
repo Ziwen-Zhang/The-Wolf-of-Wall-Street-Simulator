@@ -35,7 +35,6 @@ function TradingSideBar() {
 
   const [buyLimitPrice , setBuyLimitPrice] = useState("")
   const [sellLimitPrice , setSellLimitPrice] = useState("")
-  const [remainingAfterLimit, setRemainingAfterLimit] = useState(user?.buying_power || 0)
 
 
   const handleLimitBuy = () => {

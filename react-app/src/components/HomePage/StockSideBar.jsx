@@ -65,7 +65,6 @@ import { thunkGetStocks } from "../../redux/stock";
 function StockSideBar() {
   const dispatch = useDispatch();
   const { stockId } = useParams();
-  const navigate = useNavigate();
   const stocks = useSelector((state) => state.stock.stocks);
 
   useEffect(() => {

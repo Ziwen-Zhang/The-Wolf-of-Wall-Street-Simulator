@@ -37,10 +37,10 @@ class BelongsToUser(Base):
 class HasTimestamps(Base):
     __abstract__ = True
     created_at = db.Column(
-        db.DateTime(timezone=True), nullable=False, default=datetime.now(timezone.utc)
+        db.DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
     updated_at = db.Column(
-        db.DateTime(timezone=True), nullable=False, default=datetime.now(timezone.utc)
+        db.DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
     )
 
     @property

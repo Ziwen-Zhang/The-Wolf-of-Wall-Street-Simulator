@@ -176,7 +176,7 @@ function UserHomePage() {
   return (
     <div className="flex">
       <StockSideBar />
-      <div className="p-4 w-3/4 bg-gray-800 text-white shadow-md max-h-screen overflow-y-auto">
+      <div className="p-4 w-3/4 border-2 border-gray-900 bg-gray-800 text-white shadow-md max-h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold mb-2 text-teal-400">Investing</h1>
         <p className="text-xl font-semibold" style={{ color: lineColor }}>
           $ {user.total_net_worth + user.bank_debt}
