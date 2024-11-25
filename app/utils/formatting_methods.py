@@ -1,3 +1,4 @@
+from decimal import Decimal
 from functools import wraps
 
 
@@ -33,3 +34,10 @@ def format_date(format_type):
     ## mm/dd/yyyy
     ## mm/yy
     ## b/dd/yyyy
+
+# def format_currency(value:float) -> str:
+#     return "${:,.2f}".format(value)
+
+def format_currency(value:float):
+    return round(value, 2)
+    # return float(Decimal(value).quantize(Decimal("0.00")))
