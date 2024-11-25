@@ -64,6 +64,23 @@ def schedule_transaction(user_id, stock_id, quantity, limit_price, transaction_t
             f"Insufficient funds to schedule order. Required: {total_cost}, Available: {user.buying_power}"
         )
 
+    stock_holding = next(
+        (share.quantity for share in user.shares if share.stock_id == stock_id), 0
+    )
+
+    total_pending_sell_quantity = sum(
+        order.quantity
+        for order in Order.query.filter_by(
+            user_id=user_id, stock_id=stock_id, order_type="sell", status="pending"
+        )
+    )
+    if transaction_type == "sell" and total_pending_sell_quantity + quantity > stock_holding:
+        quantity = max(0, stock_holding - total_pending_sell_quantity)
+        if quantity == 0:
+            raise ValueError(
+                f"Cannot schedule sell order. Total pending sell orders exceed current holdings of {stock_holding}."
+            )
+
     existing_order = Order.query.filter_by(
         user_id=user_id,
         stock_id=stock_id,
@@ -73,7 +90,14 @@ def schedule_transaction(user_id, stock_id, quantity, limit_price, transaction_t
     ).first()
 
     if existing_order:
-        existing_order.quantity += quantity
+        if transaction_type == "sell":
+            new_quantity = existing_order.quantity + quantity
+            if new_quantity > stock_holding:
+                new_quantity = stock_holding
+            existing_order.quantity = new_quantity
+        else:
+            existing_order.quantity += quantity
+
         db.session.commit()
         print(f"[Schedule] Updated existing order: {existing_order}")
         return existing_order

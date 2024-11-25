@@ -11,12 +11,13 @@ import { thunkGetStocks } from "../../redux/stock";
 function OrderHistoryPage() {
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.transactions.orders);
+  const user = useSelector((state) => state.session.user);
   const transactions = useSelector(
     (state) => state.transactions.transactionHistory
   );
   const stocks = useSelector((state) => state.stock.stocks);
 
-  const [activeTab, setActiveTab] = useState("orders"); 
+  const [activeTab, setActiveTab] = useState("orders");
   const [editingOrder, setEditingOrder] = useState(null);
   const [editedValues, setEditedValues] = useState({
     quantity: 0,
@@ -66,7 +67,7 @@ function OrderHistoryPage() {
     const { name, value } = e.target;
     setEditedValues((prev) => ({
       ...prev,
-      [name]: parseFloat(value) || 0,
+      [name]: parseFloat(value) || 1,
     }));
   };
 
@@ -75,11 +76,16 @@ function OrderHistoryPage() {
     return stock ? stock.name : "Unknown Stock";
   };
 
+  const getMaxSellAmount = (stockId) => {
+    const stock = user.shares.find((stock) => stock.stock_id == stockId);
+    return stock.quantity;
+  };
+
   const sortedTransactions = [...transactions]
     .filter((transaction) => transaction && transaction.transaction_date)
     .sort(
       (a, b) => new Date(b.transaction_date) - new Date(a.transaction_date)
-    ); // 排序
+    );
 
   return (
     <div className="p-8 bg-gray-900 text-white h-screen">
@@ -124,76 +130,110 @@ function OrderHistoryPage() {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="border-b border-gray-700 hover:bg-gray-750"
-                  >
-                    <td className="p-4">{getStockName(order.stock_id)}</td>
-                    <td className="p-4 text-center">{order.order_type}</td>
-                    <td className="p-4 text-center">
-                      {editingOrder === order.id ? (
-                        <input
-                          type="number"
-                          name="quantity"
-                          value={editedValues.quantity}
-                          onChange={handleInputChange}
-                          className="w-16 p-1 bg-gray-600 text-white rounded text-center focus:outline-none focus:ring focus:ring-teal-400"
-                        />
-                      ) : (
-                        order.quantity
-                      )}
-                    </td>
-                    <td className="p-4 text-center">
-                      {editingOrder === order.id ? (
-                        <input
-                          type="number"
-                          name="limit_price"
-                          value={editedValues.limit_price}
-                          onChange={handleInputChange}
-                          className="w-16 p-1 bg-gray-600 text-white rounded text-center focus:outline-none focus:ring focus:ring-teal-400"
-                        />
-                      ) : (
-                        `$${order.limit_price.toFixed(2)}`
-                      )}
-                    </td>
-                    <td className="p-4 text-center">{order.status}</td>
-                    <td className="p-4 flex w-full justify-center space-x-2">
-                      {editingOrder === order.id ? (
-                        <>
-                          <button
-                            onClick={() => handleSaveClick(order.id)}
-                            className="w-20 px-4 py-2 bg-green-500 rounded text-white font-semibold hover:bg-green-700 text-center"
-                          >
-                            Save
-                          </button>
-                          <button
-                            onClick={() => {
-                              setEditingOrder(null);
-                              setEditedValues({ quantity: 0, limit_price: 0 });
+                {orders
+                  .sort((a, b) => {
+                    if (a.status === "pending" && b.status === "executed")
+                      return -1;
+                    if (a.status === "executed" && b.status === "pending")
+                      return 1;
+                    return new Date(b.created_at) - new Date(a.created_at);
+                  })
+                  .map((order) => (
+                    <tr
+                      key={order.id}
+                      className="border-b border-gray-700 hover:bg-gray-750"
+                    >
+                      <td className="p-4">{getStockName(order.stock_id)}</td>
+                      <td className="p-4 text-center">{order.order_type}</td>
+                      <td className="p-4 text-center">
+                        {editingOrder === order.id ? (
+                          <input
+                            type="number"
+                            name="quantity"
+                            max={getMaxSellAmount(order.stock_id)}
+                            value={editedValues.quantity}
+                            onChange={(e) => {
+                              const inputValue =
+                                parseFloat(e.target.value) || 0;
+                              const maxSellAmount = getMaxSellAmount(
+                                order.stock_id
+                              );
+                              if (inputValue > maxSellAmount || inputValue <=0) {
+                                setEditedValues((prev) => ({
+                                  ...prev,
+                                  quantity: maxSellAmount,
+                                }));
+                              } else {
+                                setEditedValues((prev) => ({
+                                  ...prev,
+                                  quantity: inputValue,
+                                }));
+                              }
                             }}
-                            className="w-20 px-4 py-2 bg-gray-500 rounded text-white font-semibold hover:bg-gray-700 text-center"
-                          >
-                            Cancel
-                          </button>
-                        </>
-                      ) : (
-                        <button
-                          onClick={() => handleEditClick(order)}
-                          className="w-20 px-4 py-2 bg-blue-500 rounded text-white font-semibold hover:bg-blue-700 text-center"
-                        >
-                          Edit
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDeleteClick(order.id)}
-                        className="w-20 px-4 py-2 bg-red-500 rounded text-white font-semibold hover:bg-red-700 text-center"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                            className="w-16 p-1 bg-gray-600 text-white rounded text-center focus:outline-none focus:ring focus:ring-teal-400"
+                          />
+                        ) : (
+                          order.quantity
+                        )}
+                      </td>
+                      <td className="p-4 text-center">
+                        {editingOrder === order.id ? (
+                          <input
+                            type="number"
+                            name="limit_price"
+                            min={1}
+                            value={editedValues.limit_price}
+                            onChange={handleInputChange}
+                            className="w-16 p-1 bg-gray-600 text-white rounded text-center focus:outline-none focus:ring focus:ring-teal-400"
+                          />
+                        ) : (
+                          `$${order.limit_price.toFixed(2)}`
+                        )}
+                      </td>
+                      <td className="p-4 text-center">{order.status}</td>
+                      <td className="p-4 flex w-full justify-center space-x-2">
+                        {order.status !== "executed" ? (
+                          editingOrder === order.id ? (
+                            <>
+                              <button
+                                onClick={() => handleSaveClick(order.id)}
+                                className="w-20 px-4 py-2 bg-green-500 rounded text-white font-semibold hover:bg-green-700 text-center"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setEditingOrder(null);
+                                  setEditedValues({
+                                    quantity: 0,
+                                    limit_price: 0,
+                                  });
+                                }}
+                                className="w-20 px-4 py-2 bg-gray-500 rounded text-white font-semibold hover:bg-gray-700 text-center"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleEditClick(order)}
+                                className="w-20 px-4 py-2 bg-blue-500 rounded text-white font-semibold hover:bg-blue-700 text-center"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeleteClick(order.id)}
+                                className="w-20 px-4 py-2 bg-red-500 rounded text-white font-semibold hover:bg-red-700 text-center"
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )
+                        ) : null}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           ) : (

@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 function LoginFormModal() {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("");
+  const [credential, setCredential] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const { closeModal } = useModal();
@@ -17,7 +17,7 @@ function LoginFormModal() {
 
     const serverResponse = await dispatch(
       thunkLogin({
-        email,
+        credential,
         password,
       })
     );
@@ -54,17 +54,17 @@ function LoginFormModal() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-yellow-400">
-            Email
+            Email/Username
           </label>
           <input
             type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={credential}
+            onChange={(e) => setCredential(e.target.value)}
             required
             className="mt-1 block w-full px-3 py-2 border border-green-500 rounded-md shadow-sm bg-gray-800 text-yellow-400 placeholder-gray-500 focus:outline-none focus:ring-yellow-400 focus:border-yellow-400 sm:text-sm"
           />
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+          {errors.credential && (
+            <p className="mt-1 text-sm text-red-500">{errors.credential}</p>
           )}
         </div>
 

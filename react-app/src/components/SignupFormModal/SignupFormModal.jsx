@@ -57,7 +57,7 @@ function SignupFormModal() {
             Email
           </label>
           <input
-            type="text"
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -74,6 +74,7 @@ function SignupFormModal() {
           <input
             type="text"
             value={username}
+            maxLength={10}
             onChange={(e) => setUsername(e.target.value)}
             required
             className="mt-1 block w-full px-3 py-2 border border-green-500 rounded-md shadow-sm bg-gray-800 text-yellow-400 placeholder-gray-500 focus:outline-none focus:ring-yellow-400 focus:border-yellow-400 sm:text-sm"
@@ -88,6 +89,7 @@ function SignupFormModal() {
           </label>
           <input
             type="text"
+            maxLength={10}
             value={first_name}
             onChange={(e) => setFirstName(e.target.value)}
             required
@@ -103,6 +105,7 @@ function SignupFormModal() {
           </label>
           <input
             type="text"
+            maxLength={10}
             value={last_name}
             onChange={(e) => setLastName(e.target.value)}
             required
@@ -119,6 +122,7 @@ function SignupFormModal() {
           <input
             type="password"
             value={password}
+            maxLength={20}
             onChange={(e) => setPassword(e.target.value)}
             required
             className="mt-1 block w-full px-3 py-2 border border-green-500 rounded-md shadow-sm bg-gray-800 text-green-300 placeholder-gray-500 focus:outline-none focus:ring-yellow-400 focus:border-yellow-400 sm:text-sm"
@@ -133,6 +137,7 @@ function SignupFormModal() {
           </label>
           <input
             type="password"
+            maxLength={20}
             value={confirm_password}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required

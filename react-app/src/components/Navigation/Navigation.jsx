@@ -9,15 +9,15 @@ import { AiOutlineTransaction } from "react-icons/ai";
 import { MdLeaderboard } from "react-icons/md";
 
 function Navigation() {
-  const user = useSelector((state) => state.session.user); // 从 Redux 获取用户状态
+  const user = useSelector((state) => state.session.user);
   const [mainTitle, setMainTitle] = useState(
     "The Wolf of Wall Street Simulator"
-  ); // 主标题状态
+  );
 
   useEffect(() => {
     if (user) {
-      const maxDebt = 1000000; // 假设最大 debt 为 1000000
-      const initialNetWorth = 100000; // 初始净资产
+      const maxDebt = 1000000;
+      const initialNetWorth = 100000;
       const totalLossPercentage =
         ((initialNetWorth - user.total_net_worth) / initialNetWorth) * 100;
 
