@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { thunkBuyStock, thunkSellStock } from "../../redux/transaction";
+import { thunkBuyStock, thunkScheduleLimitBuy, thunkSellStock } from "../../redux/transaction";
 import { thunkAuthenticate } from "../../redux/session";
 import ErrorModal from "../ErrorModal/ErrorModal";
 import { useParams } from "react-router-dom";
@@ -14,7 +14,7 @@ function TradingSideBar() {
   const stocks = useSelector((state) => state.stock.stocks);
   const ownedShares = useSelector((state) => {
     const shareData = state.ownedShares.ownedShares.find(
-      (share) => share.stock_id === Number(stockId) 
+      (share) => share.stock_id === Number(stockId)
     );
     return shareData ? shareData.quantity : 0;
   });
@@ -29,10 +29,43 @@ function TradingSideBar() {
   const [maxBuyQuantity, setMaxBuyQuantity] = useState(
     stock ? Math.floor(user?.buying_power / stock.price) || 0 : 0
   );
-  const [maxSellQuantity, setMaxSellQuantity] = useState(ownedShares || 0); 
+  const [maxSellQuantity, setMaxSellQuantity] = useState(ownedShares || 0);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [buyLimitPrice , setBuyLimitPrice] = useState("")
+  const [sellLimitPrice , setSellLimitPrice] = useState("")
+  const [remainingAfterLimit, setRemainingAfterLimit] = useState(user?.buying_power || 0)
+
+
+  const handleLimitBuy = () => {
+    if (!buyQuantity || buyQuantity <= 0 || buyLimitPrice <= 0) {
+      setErrorMessage("Invalid limit buy quantity or price! Please adjust.");
+      setShowErrorModal(true);
+      return;
+    }
+
+    dispatch(thunkScheduleLimitBuy(stock.id,buyQuantity,buyLimitPrice,"buy"));
+    setBuyQuantity(1);
+    setBuyLimitPrice("");
+    dispatch(thunkAuthenticate());
+    dispatch(thunkGetStocks());
+  };
+
+  const handleLimitSell = () => {
+    if (!sellQuantity || sellQuantity <= 0 || sellLimitPrice <= 0 || sellQuantity > maxSellQuantity) {
+      setErrorMessage("Invalid limit sell quantity or price! Please adjust.");
+      setShowErrorModal(true);
+      return;
+    }
+    
+    dispatch(thunkScheduleLimitBuy(stock.id,sellQuantity,sellLimitPrice,"sell"));
+    setSellQuantity(1);
+    setSellLimitPrice("");
+    dispatch(thunkAuthenticate());
+    dispatch(thunkGetStocks());
+  };
+  
   useEffect(() => {
     if (user && stock) {
       setMaxBuyQuantity(Math.floor(user.buying_power / stock.price));
@@ -50,7 +83,7 @@ function TradingSideBar() {
       setRemainingAfterBuy(user.buying_power - maxBuyQuantity * stock.price);
     } else {
       setBuyQuantity(inputValue || 0);
-      setBuyCost((inputValue || 0) * stock.price); 
+      setBuyCost((inputValue || 0) * stock.price);
       setRemainingAfterBuy(user.buying_power - (inputValue || 0) * stock.price);
     }
   };
@@ -65,15 +98,19 @@ function TradingSideBar() {
   };
 
   const handleBuy = () => {
-    if (!buyQuantity || buyQuantity <= 0) return;
+    if (!buyQuantity || buyQuantity <= 0){
+      setErrorMessage("Insufficient buying power! Please adjust the quantity.");
+      setShowErrorModal(true);
+    }
 
     if (remainingAfterBuy < 0) {
       setErrorMessage("Insufficient buying power! Please adjust the quantity.");
       setShowErrorModal(true);
     } else {
       dispatch(thunkBuyStock(stock.id, buyQuantity));
+      setBuyQuantity(1)
       dispatch(thunkAuthenticate());
-      dispatch(thunkGetStocks())
+      dispatch(thunkGetStocks());
     }
   };
 
@@ -83,17 +120,17 @@ function TradingSideBar() {
       setShowErrorModal(true);
     } else {
       dispatch(thunkSellStock(stock.id, sellQuantity));
-      dispatch(thunkGetStocks())
+      dispatch(thunkGetStocks());
       dispatch(thunkAuthenticate());
-      setSellQuantity(1)
+      setSellQuantity(1);
     }
   };
 
-  const handleAllin=()=>{
+  const handleAllin = () => {
     dispatch(thunkBuyStock(stock.id, maxBuyQuantity));
     dispatch(thunkAuthenticate());
-    dispatch(thunkGetStocks())
-  }
+    dispatch(thunkGetStocks());
+  };
 
   const handleModalClose = () => {
     setShowErrorModal(false);
@@ -137,60 +174,115 @@ function TradingSideBar() {
           ${remainingAfterBuy.toFixed(2)}
         </span>
       </div>
-
       {/* Buy input box */}
-      <div>
-        <label htmlFor="buyQuantity" className="font-semibold text-teal-400">
-          Buy Quantity
+      <div > 
+        <label htmlFor="buyQuantity" className="flex justify-between items-center font-semibold text-teal-400">
+          <span>Buy Quantity</span>
+          <span>Limit price</span>
         </label>
-        <input
-          type="number"
-          id="buyQuantity"
-          min="1"
-          max={maxBuyQuantity}
-          value={buyQuantity}
-          onChange={handleBuyQuantityChange}
-          className="w-full px-2 py-1 mt-1 rounded-md bg-gray-700 text-gray-300 focus:outline-none focus:ring focus:ring-teal-400"
-        />
+        <div className="w-full flex space-x-1">
+  {/* Buy Quantity Input */}
+  <input
+    type="number"
+    id="buyQuantity"
+    min="1"
+    max={maxBuyQuantity}
+    value={buyQuantity}
+    onChange={handleBuyQuantityChange}
+    className="w-1/2 flex-1 px-2 py-1 rounded-l-md bg-gray-700 text-gray-300 focus:outline-none focus:ring focus:ring-teal-400"
+    placeholder="Quantity"
+  />
+
+  {/* Limit Price Input */}
+  <input
+    type="number"
+    id="limitPrice"
+    min="0"
+    value={buyLimitPrice}
+    onChange={(e) =>setBuyLimitPrice(parseFloat(e.target.value)) } 
+    className="w-1/2 text-right flex-1 px-2 py-1 rounded-r-md bg-gray-700 text-gray-300 focus:outline-none focus:ring focus:ring-teal-400"
+    placeholder="Limit Price"
+  />
+</div>
+
         <small className="text-gray-400">
           Max Buy Quantity: {maxBuyQuantity} shares
         </small>
       </div>
-      <button
-        onClick={handleBuy}
-        className="w-full px-6 py-2 bg-green-500 text-white font-bold rounded shadow-md hover:bg-green-700 active:scale-95 active:bg-green-700 transition-transform duration-150"
-      >
-        Buy
-      </button>
+      <div className="w-full flex space-x-1">
+        {/* Buy Button */}
+        <button
+          onClick={handleBuy}
+          className="flex-1 px-3 py-2 bg-green-500 text-white font-bold rounded-l shadow-md hover:bg-green-700 active:scale-95 active:bg-green-700 transition-transform duration-150"
+        >
+          Buy
+        </button>
+
+        {/* Limit Buy Button */}
+        <button
+          onClick={(handleLimitBuy)}
+          className="flex-1 px-3 py-2 bg-blue-500 text-white font-bold rounded-r shadow-md hover:bg-blue-700 active:scale-95 active:bg-blue-700 transition-transform duration-150"
+        >
+          Limit Buy
+        </button>
+      </div>
 
       {/* Sell input box */}
       <div>
-        <label htmlFor="sellQuantity" className="font-semibold text-teal-400">
-          Sell Quantity
+        <label htmlFor="sellQuantity" className="flex justify-between items-center font-semibold text-teal-400">
+        <span>Sell Quantity</span>
+        <span>Limit price</span>
         </label>
-        <input
-          type="number"
-          id="sellQuantity"
-          min="1"
-          max={maxSellQuantity}
-          value={sellQuantity}
-          onChange={handleSellQuantityChange}
-          className="w-full px-2 py-1 mt-1 rounded-md bg-gray-700 text-gray-300 focus:outline-none focus:ring focus:ring-teal-400"
-        />
+        <div className="w-full flex space-x-1 mt-1">
+  {/* Sell Quantity Input */}
+  <input
+    type="number"
+    id="sellQuantity"
+    min="1"
+    max={maxSellQuantity}
+    value={sellQuantity}
+    onChange={handleSellQuantityChange}
+    className="w-1/2 flex-1 px-2 py-1 rounded-l-md bg-gray-700 text-gray-300 focus:outline-none focus:ring focus:ring-teal-400"
+    placeholder="Quantity"
+  />
+
+  {/* Limit Price Input */}
+  <input
+    type="number"
+    id="limitPrice"
+    min="0"
+    value={sellLimitPrice}
+    onChange={(e) =>setSellLimitPrice(parseFloat(e.target.value))} // Placeholder handler
+    className="w-1/2 text-right flex-1 px-2 py-1 rounded-r-md bg-gray-700 text-gray-300 focus:outline-none focus:ring focus:ring-teal-400"
+    placeholder="Limit Price"
+  />
+</div>
         <small className="text-gray-400">
           Max Sell Quantity: {maxSellQuantity} shares
         </small>
       </div>
-      <button
-        onClick={handleSell}
-        className="w-full px-6 py-2 bg-red-500 text-white font-bold rounded shadow-md hover:bg-red-700 active:scale-95 active:bg-red-700 transition-transform duration-150"
-      >
-        Sell
-      </button>
-      <button className="w-full px-6 py-2 bg-yellow-400 text-red-700 font-bold rounded shadow-md hover:bg-red-700 hover:text-yellow-500 active:scale-95 active:bg-red-700 transition-transform duration-150"
-      onClick={handleAllin}
-      >
+      <div className="w-full flex space-x-1">
+  {/* Sell Button */}
+  <button
+    onClick={handleSell}
+    className="flex-1 px-3 py-2 bg-red-500 text-white font-bold rounded-l shadow-md hover:bg-red-700 active:scale-95 active:bg-red-700 transition-transform duration-150"
+  >
+    Sell
+  </button>
+  
+  {/* Limit Sell Button */}
+  <button
+    onClick={(handleLimitSell)}
+    className="flex-1 px-3 py-2 bg-purple-500 text-white font-bold rounded-r shadow-md hover:bg-purple-700 active:scale-95 active:bg-purple-700 transition-transform duration-150"
+  >
+    Limit Sell
+  </button>
+</div>
 
+      <button
+        className="w-full px-6 py-2 bg-yellow-400 text-red-700 font-bold rounded shadow-md hover:bg-red-700 hover:text-yellow-500 active:scale-95 active:bg-red-700 transition-transform duration-150"
+        onClick={handleAllin}
+      >
         ALL IN
       </button>
       {/* Error modal */}
@@ -200,7 +292,7 @@ function TradingSideBar() {
         title="Error"
         message={errorMessage}
       />
-      <Saves/>
+      <Saves />
     </div>
   );
 }

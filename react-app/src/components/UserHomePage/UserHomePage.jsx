@@ -15,7 +15,6 @@ import {
 } from "chart.js";
 import { thunkGetStocks } from "../../redux/stock";
 import StockSideBar from "../HomePage/StockSideBar";
-import { useNotificationChecker } from "../Hook/useNotificationChecker";
 
 ChartJS.register(
   CategoryScale,
@@ -34,7 +33,6 @@ function UserHomePage() {
   const [repayAmount, setRepayAmount] = useState(0);
   const [maxloan, setMaxloan] = useState(0);
   const [maxRepay, setMaxRepay] = useState(0);
-  useNotificationChecker()
   useEffect(() => {
     if (user) {
       setMaxloan(1000000 - user.bank_debt);

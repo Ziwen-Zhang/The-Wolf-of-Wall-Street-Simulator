@@ -126,10 +126,10 @@ def edit_scheduled_order(order_id):
 
     if quantity:
         order.quantity = quantity
+    if order_type:
+        order.order_type = order_type
     if limit_price:
         order.limit_price = limit_price
-    if order_type:
-        order.transaction_type = order_type
 
     db.session.commit()
 
@@ -158,3 +158,25 @@ def check_order():
     orders = Order.query.filter_by(user_id=current_user.id).all()
     order_list = [o.to_dict() for o in orders]
     return jsonify({"orders":order_list})
+
+
+@transactions_routes.route("/schedule/<int:order_id>/status", methods=["PUT"])
+@login_required
+def update_order_status(order_id):
+    data = request.get_json()
+    status = data.get("status")
+
+    if not status:
+        return jsonify({"error": "Status is required."}), 400
+
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({"error": "Order not found."}), 404
+
+    if order.user_id != current_user.id:
+        return jsonify({"error": "Unauthorized access."}), 403
+
+    order.status = status
+    db.session.commit()
+
+    return jsonify({"message": "Order status updated successfully", "order": order.to_dict()}), 200

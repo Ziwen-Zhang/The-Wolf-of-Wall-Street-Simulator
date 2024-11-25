@@ -7,10 +7,9 @@ import {
   createSave,
 } from "../../redux/save";
 import { thunkGetStocks, startStockUpdates } from "../../redux/stock";
-import { useNotificationChecker } from "../Hook/useNotificationChecker";
 
 function WatchlistPage() {
-    useNotificationChecker()
+
   const dispatch = useDispatch();
   const saves = useSelector((state) => state.saves.saves);
   const stocks = useSelector((state) => state.stock.stocks);
@@ -104,12 +103,8 @@ function WatchlistPage() {
           <tbody>
             {Object.keys(saves).map((stockId) =>
               saves[stockId].map((save) => {
-                const {
-                  name,
-                  currentPrice,
-                  highestToday,
-                  lowestToday,
-                } = getStockDetails(save.stock_id);
+                const { name, currentPrice, highestToday, lowestToday } =
+                  getStockDetails(save.stock_id);
 
                 return (
                   <tr
@@ -117,7 +112,9 @@ function WatchlistPage() {
                     className="border-b border-gray-700 hover:bg-gray-750"
                   >
                     <td className="p-4">{name}</td>
-                    <td className="p-4 text-center text-green-500">${currentPrice}</td>
+                    <td className="p-4 text-center text-green-500">
+                      ${currentPrice}
+                    </td>
                     <td className="p-4 text-center text-yellow-400">
                       ${highestToday}
                     </td>
@@ -131,42 +128,49 @@ function WatchlistPage() {
                           name="target_price"
                           value={editedValues.target_price}
                           onChange={handleInputChange}
-                          className="p-2 bg-gray-600 text-white rounded"
+                          className="w-16 p-1 bg-gray-600 text-white rounded text-center focus:outline-none focus:ring focus:ring-teal-400"
                         />
                       ) : (
                         `$${parseFloat(save.target_price).toFixed(2)}`
                       )}
                     </td>
                     <td className="p-4 text-center">
-                      {editingSave === save.id ? (
-                        <span className="text-gray-300 font-semibold">
-                          {save.alert_type.charAt(0).toUpperCase() +
-                            save.alert_type.slice(1)}
-                        </span>
-                      ) : (
-                        save.alert_type.charAt(0).toUpperCase() +
-                        save.alert_type.slice(1)
-                      )}
+                      {save.alert_type.charAt(0).toUpperCase() +
+                        save.alert_type.slice(1)}
                     </td>
-                    <td className="p-4 flex justify-center space-x-2">
+                    <td className="p-4 flex w-full justify-center space-x-2">
                       {editingSave === save.id ? (
-                        <button
-                          onClick={() => handleSaveClick(save.stock_id)}
-                          className="px-4 py-2 bg-green-500 rounded text-white font-semibold hover:bg-green-700"
-                        >
-                          Save
-                        </button>
+                        <>
+                          <button
+                            onClick={() => handleSaveClick(save.stock_id)}
+                            className="w-20 px-4 py-2 bg-green-500 rounded text-white font-semibold hover:bg-green-700"
+                          >
+                            Save
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingSave(null);
+                              setEditedValues({
+                                target_price: 0,
+                                alert_type: "",
+                              });
+                            }}
+                            className="w-20 px-4 py-2 bg-gray-500 rounded text-white font-semibold hover:bg-gray-700"
+                          >
+                            Cancel
+                          </button>
+                        </>
                       ) : (
                         <button
                           onClick={() => handleEditClick(save)}
-                          className="px-4 py-2 bg-blue-500 rounded text-white font-semibold hover:bg-blue-700"
+                          className="w-20 px-4 py-2 bg-blue-500 rounded text-white font-semibold hover:bg-blue-700"
                         >
                           Edit
                         </button>
                       )}
                       <button
                         onClick={() => handleDeleteClick(save.id)}
-                        className="px-4 py-2 bg-red-500 rounded text-white font-semibold hover:bg-red-700"
+                        className="w-20 px-4 py-2 bg-red-500 rounded text-white font-semibold hover:bg-red-700"
                       >
                         Delete
                       </button>

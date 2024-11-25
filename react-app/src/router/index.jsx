@@ -4,37 +4,11 @@ import SignupFormPage from "../components/SignupFormPage";
 import Layout from "./Layout";
 import StockDetailPage from "../components/StockPage/StockDetailPage";
 import UserHomePage from "../components/UserHomePage/UserHomePage";
-import HomePageRedirect from "../components/HomePage/HomePageRedirect";
 import MainPage from "../components/HomePage/MainPage";
 import WatchlistPage from "../components/Watchlist/WatchlistPage";
-import OwnedStocksPage from "../components/UserHomePage/UserSharesPage";
+import OrderHistoryPage from "../components/UserHomePage/OrderHistoryPage";
 
 export const router = createBrowserRouter([
-  // {
-  //   element: <Layout />,
-  //   children: [
-  //     {
-  //       path: "/",
-  //       element: <HomePageRedirect />,
-  //     },
-  //     {
-  //       path: "login",
-  //       element: <LoginFormPage />,
-  //     },
-  //     {
-  //       path: "signup",
-  //       element: <SignupFormPage />,
-  //     },
-  //     {
-  //       path: "/stocks/:stockId",
-  //       element: <StockDetailPage />,
-  //     },
-  //     {
-  //       path: "/user",
-  //       element: <UserHomePage />,
-  //     },
-  //   ],
-  // },
   {
     element: <Layout />, 
     children: [
@@ -61,6 +35,10 @@ export const router = createBrowserRouter([
       {
         path:"watchlist",
         element:<WatchlistPage/>
+      },
+      {
+        path:"history",
+        element:<OrderHistoryPage/>
       }
     ],
   },

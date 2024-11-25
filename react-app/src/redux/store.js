@@ -10,6 +10,7 @@ import stockReducer from "./stock";
 import ownedSharesReducer from "./ownedshares";
 import savesReducer from "./save";
 import { notificationReducer } from "./notification";
+import transactionReducer from "./transaction";
 
 const rootReducer = combineReducers({
   session: sessionReducer,
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   ownedShares:ownedSharesReducer,
   saves:savesReducer,
   notifications:notificationReducer,
+  transactions:transactionReducer
 });
 
 let enhancer;

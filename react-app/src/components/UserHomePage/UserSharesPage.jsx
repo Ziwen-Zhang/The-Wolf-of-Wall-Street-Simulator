@@ -28,7 +28,6 @@ function OwnedStocksPage() {
   const dispatch = useDispatch();
   const stocks = useSelector((state) => state.stock.stocks);
   const ownedShares = useSelector((state) => state.ownedShares.ownedShares);
-  console.log(ownedShares)
   const stockHistories = useSelector((state) => state.stock.allRecords);
   const [selectedStock, setSelectedStock] = useState(null);
   const [tradeDetails, setTradeDetails] = useState({
