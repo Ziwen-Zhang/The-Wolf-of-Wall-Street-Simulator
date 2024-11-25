@@ -49,6 +49,7 @@ def add_fund():
     loan_amount = min(amount, max_loanable)
     user.base_buying_power += loan_amount
     user.bank_debt += loan_amount
+    user.update_total_net_worth()
     db.session.commit()
     return jsonify(
         {
@@ -75,6 +76,7 @@ def repay_loan():
         return jsonify({"error": "Insufficient buying power to repay debt."}), 400
     user.bank_debt -= max_repayable
     user.base_buying_power -= max_repayable
+    user.update_total_net_worth()
     db.session.commit()
     return jsonify(
         {

@@ -81,8 +81,8 @@ random_price_thread.start()
 # limit_order_thread = Thread(target=process_orders, daemon=True)
 # limit_order_thread.start()
 
-# random_transaction_thread = Thread(target=simulate_transactions, daemon=True)
-# random_transaction_thread.start()
+random_transaction_thread = Thread(target=simulate_transactions, daemon=True)
+random_transaction_thread.start()
 
 # save_notification_thread = Thread(target=process_save_notifications, args=(socketio,), daemon=True)
 # save_notification_thread.start()

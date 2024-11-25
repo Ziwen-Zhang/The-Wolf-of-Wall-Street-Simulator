@@ -58,7 +58,7 @@
 // export default StockSideBar;
 
 import { useEffect } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams} from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { thunkGetStocks } from "../../redux/stock";
 

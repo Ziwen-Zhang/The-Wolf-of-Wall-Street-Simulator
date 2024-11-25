@@ -117,15 +117,16 @@ export const notificationReducer = (state = initialState, action) => {
         unreadCount: action.notifications.filter((n) => !n.read).length,
       };
 
-    case MARK_NOTIFICATION_AS_READ:
-      const updatedNotifications = state.notifications.map((n) =>
-        n.id === action.notificationId ? { ...n, read: true } : n
-      );
-      return {
-        ...state,
-        notifications: updatedNotifications,
-        unreadCount: updatedNotifications.filter((n) => !n.read).length,
-      };
+      case MARK_NOTIFICATION_AS_READ: {
+        const updatedNotifications = state.notifications.map((n) =>
+          n.id === action.notificationId ? { ...n, read: true } : n
+        );
+        return {
+          ...state,
+          notifications: updatedNotifications,
+          unreadCount: updatedNotifications.filter((n) => !n.read).length,
+        };
+      }
     case POST_NOTIFICATION:
       return {
         ...state,

@@ -1,4 +1,3 @@
-# app/seeds/seed_tags.py
 from app.models import db, Tag, environment, SCHEMA
 from sqlalchemy.sql import text
 

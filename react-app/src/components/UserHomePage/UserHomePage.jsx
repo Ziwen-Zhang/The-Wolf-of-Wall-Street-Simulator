@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { thunkAuthenticate } from "../../redux/session";
+import { thunkAuthenticate, setInvestingHistory } from "../../redux/session";
 import { thunkLoan, thunkRepay } from "../../redux/loan";
 import { Line } from "react-chartjs-2";
 import {
@@ -29,10 +29,17 @@ ChartJS.register(
 function UserHomePage() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.session.user);
+  const investingHistory = useSelector(
+    (state) => state.session.investingHistory
+  );
+
   const [loanAmount, setLoanAmount] = useState(0);
   const [repayAmount, setRepayAmount] = useState(0);
   const [maxloan, setMaxloan] = useState(0);
   const [maxRepay, setMaxRepay] = useState(0);
+
+  // const initialNetWorth = 100000;
+
   useEffect(() => {
     if (user) {
       setMaxloan(1000000 - user.bank_debt);
@@ -40,95 +47,85 @@ function UserHomePage() {
     }
   }, [user]);
 
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      dispatch(thunkAuthenticate());
+      dispatch(thunkGetStocks());
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      const intervalId = setInterval(() => {
+        const now = new Date().toLocaleTimeString();
+        const updatedPrices = [
+          ...investingHistory.prices,
+          user.total_net_worth,
+        ];
+        const updatedTimestamps = [...investingHistory.timestamps, now];
+
+        if (updatedPrices.length > 500) {
+          updatedPrices.shift();
+          updatedTimestamps.shift();
+        }
+
+        if (updatedPrices[0] !== 100000) {
+          updatedPrices.unshift(100000);
+          updatedTimestamps.unshift("Start");
+        }
+
+        const newHistory = {
+          prices: updatedPrices,
+          timestamps: updatedTimestamps,
+        };
+
+        dispatch(setInvestingHistory(newHistory));
+      }, 2000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [dispatch, user, investingHistory]);
+
   const handleLoanAmount = (e) => {
-    const inputValue = parseFloat(e.target.value);
+    const inputValue = parseInt(e.target.value, 10);
     if (isNaN(inputValue) || inputValue <= 0) {
       setLoanAmount(0);
     } else {
-      setLoanAmount(Math.min(inputValue, maxloan));
+      setLoanAmount(Math.min(inputValue, Math.floor(maxloan)));
     }
   };
 
   const handleRepayAmount = (e) => {
-    const inputValue = parseFloat(e.target.value);
+    const inputValue = parseInt(e.target.value, 10);
     if (isNaN(inputValue) || inputValue <= 0) {
       setRepayAmount(0);
     } else {
-      setRepayAmount(Math.min(inputValue, user.buying_power, maxRepay));
+      const maxAllowedRepay = Math.min(
+        Math.floor(user.buying_power),
+        Math.floor(user.bank_debt)
+      );
+      setRepayAmount(Math.min(inputValue, maxAllowedRepay));
     }
   };
 
-  const [investingHistory, setInvestingHistory] = useState(() => {
-    const storedHistory = localStorage.getItem("investingHistoryData");
-    return storedHistory
-      ? JSON.parse(storedHistory)
-      : { prices: [], timestamps: [] };
-  });
-
-  const initialNetWorth = 100000;
-
-  useEffect(() => {
-    if (user) {
-      const refreshInterval = setInterval(() => {
-        dispatch(thunkAuthenticate());
-        dispatch(thunkGetStocks());
-      }, 3000);
-
-      return () => clearInterval(refreshInterval);
-    }
-  }, [dispatch, user]);
-
-  useEffect(() => {
-    if (user) {
-      const interval = setInterval(() => {
-        setInvestingHistory((prevState) => {
-          const now = new Date().toLocaleTimeString();
-          const updatedPrices = [...prevState.prices, user.total_net_worth];
-          const updatedTimestamps = [...prevState.timestamps, now];
-
-          if (updatedPrices.length > 500) {
-            updatedPrices.shift();
-            updatedTimestamps.shift();
-          }
-
-          const newHistory = {
-            prices: updatedPrices,
-            timestamps: updatedTimestamps,
-          };
-
-          localStorage.setItem(
-            "investingHistoryData",
-            JSON.stringify(newHistory)
-          );
-
-          return newHistory;
-        });
-      }, 3000);
-
-      return () => clearInterval(interval);
-    }
-  }, [user]);
-
-  if (!user) {
-    return (
-      <div className="text-center text-gray-500">Loading user data...</div>
-    );
-  }
-
-  const handleLoanMoney = () => {
-    dispatch(thunkLoan(loanAmount));
+  const handleLoanMoney = async () => {
+    await dispatch(thunkLoan(loanAmount));
     setLoanAmount(0);
-    dispatch(thunkAuthenticate());
+    await dispatch(thunkAuthenticate());
   };
 
-  const handleRepayMoney = () => {
-    dispatch(thunkRepay(repayAmount));
-    setRepayAmount(0);
-    dispatch(thunkAuthenticate());
+  const handleRepayMoney = async () => {
+    if (repayAmount > 0) {
+      await dispatch(thunkRepay(repayAmount));
+      setRepayAmount(0);
+      await dispatch(thunkAuthenticate());
+    }
   };
 
   const lineColor =
-    user.total_net_worth >= initialNetWorth 
+    user.total_net_worth-user.bank_debt >= 100000
       ? "rgba(0, 255, 0, 1)"
       : "rgba(255, 0, 0, 1)";
 
@@ -150,28 +147,24 @@ function UserHomePage() {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        display: false,
-      },
-      title: {
-        display: false,
-      },
+      legend: { display: false },
+      title: { display: false },
     },
     scales: {
-      x: {
-        ticks: {
-          autoSkip: true,
-          maxTicksLimit: 10,
-        },
-      },
-      y: {
-        beginAtZero: false,
-      },
+      x: { ticks: { autoSkip: true, maxTicksLimit: 10 } },
+      y: { beginAtZero: false },
     },
   };
 
-  const totalEarnings = user.total_net_worth - initialNetWorth;
-  const earningsPercentage = (totalEarnings / (user.total_net_worth + user.bank_debt)) * 100;
+  const totalEarnings = user.total_net_worth - 100000 - user.bank_debt;
+  const earningsPercentage =
+    (totalEarnings / 100000 ) * 100;
+
+  if (!user) {
+    return (
+      <div className="text-center text-gray-500">Loading user data...</div>
+    );
+  }
 
   return (
     <div className="flex">
@@ -179,7 +172,7 @@ function UserHomePage() {
       <div className="p-4 w-3/4 border-2 border-gray-900 bg-gray-800 text-white shadow-md max-h-screen overflow-y-auto">
         <h1 className="text-2xl font-bold mb-2 text-teal-400">Investing</h1>
         <p className="text-xl font-semibold" style={{ color: lineColor }}>
-          $ {user.total_net_worth + user.bank_debt}
+          $ {user.total_net_worth.toFixed(2)}
         </p>
         <div className="bg-gray-900 p-4 rounded-lg shadow-lg w-full h-64 sm:h-96">
           <Line data={data} options={options} />

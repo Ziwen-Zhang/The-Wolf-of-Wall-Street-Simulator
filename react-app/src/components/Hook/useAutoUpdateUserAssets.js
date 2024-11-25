@@ -1,18 +1,32 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { thunkAuthenticate } from "../../redux/session";
+import { thunkAuthenticate, setInvestingHistory } from "../../redux/session";
 
 export const useAutoUpdateUserAssets = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.session.user);
+  const assetsHistory = useSelector((state) => state.session.assetsHistory); 
 
   useEffect(() => {
     if (user) {
-      const interval = setInterval(() => {
-        dispatch(thunkAuthenticate());
+      const intervalId = setInterval(() => {
+        dispatch(thunkAuthenticate()).then((response) => {
+          if (response && response.payload) {
+            const now = new Date().toLocaleTimeString();
+            const updatedHistory = [
+              ...assetsHistory,
+              { timestamp: now, netWorth: response.payload.total_net_worth },
+            ];
+            if (updatedHistory.length > 500) {
+              updatedHistory.shift();
+            }
+
+            dispatch(setInvestingHistory(updatedHistory));
+          }
+        });
       }, 3000);
 
-      return () => clearInterval(interval);
+      return () => clearInterval(intervalId); 
     }
-  }, [dispatch, user]);
+  }, [dispatch, user, assetsHistory]);
 };

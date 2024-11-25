@@ -44,13 +44,20 @@ export const thunkGetStocks = () => async (dispatch) => {
   }
 };
 
-export const startStockUpdates = () => (dispatch) => {
+export const startStockUpdates = () => (dispatch, getState) => {
   dispatch(thunkGetStocks());
-  dispatch(thunkGetShares())
+
+  if (getState().session.user) {
+    dispatch(thunkGetShares());
+  }
   const intervalId = setInterval(() => {
-    dispatch(thunkGetShares())
     dispatch(thunkGetStocks());
+
+    if (getState().session.user) {
+      dispatch(thunkGetShares()); 
+    }
   }, 3000);
+
   return () => clearInterval(intervalId);
 };
 

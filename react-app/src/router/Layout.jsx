@@ -12,6 +12,7 @@ export default function Layout() {
   useNotificationChecker()
   useAutoStockUpdate
   useAutoUpdateUserAssets();
+  useAutoUpdateUserAssets()
   return (
     <ModalProvider>
         <Navigation />

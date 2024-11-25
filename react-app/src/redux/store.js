@@ -12,14 +12,23 @@ import savesReducer from "./save";
 import { notificationReducer } from "./notification";
 import transactionReducer from "./transaction";
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
   session: sessionReducer,
-  stock:stockReducer,
-  ownedShares:ownedSharesReducer,
-  saves:savesReducer,
-  notifications:notificationReducer,
-  transactions:transactionReducer
+  stock: stockReducer,
+  ownedShares: ownedSharesReducer,
+  saves: savesReducer,
+  notifications: notificationReducer,
+  transactions: transactionReducer,
 });
+
+const rootReducer = (state, action) => {
+  if (action.type === "CLEAR_NON_STOCK_STATE") {
+    state = {
+      stock: state.stock, 
+    };
+  }
+  return appReducer(state, action);
+};
 
 let enhancer;
 if (import.meta.env.MODE === "production") {

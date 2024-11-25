@@ -17,7 +17,6 @@
 // }
 
 // export default MainPage;
-import StockSideBar from "./StockSideBar";
 import StockDetailPage from "../StockPage/StockDetailPage";
 import UserHomePage from "../UserHomePage/UserHomePage";
 import { useSelector } from "react-redux";

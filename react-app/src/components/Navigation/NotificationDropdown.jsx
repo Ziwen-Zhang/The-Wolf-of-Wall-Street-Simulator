@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchNotifications,
@@ -14,6 +14,7 @@ function NotificationDropdown() {
   const unreadCount = useSelector((state) => state.notifications.unreadCount);
   const [isOpen, setIsOpen] = useState(false);
   const [filteredNotifications, setFilteredNotifications] = useState([]);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     dispatch(fetchNotifications());
@@ -21,9 +22,9 @@ function NotificationDropdown() {
 
   useEffect(() => {
     const unreadNotifications = notifications.filter(
-        (notification) => !notification.read
-      );
-      setFilteredNotifications(unreadNotifications);
+      (notification) => !notification.read
+    );
+    setFilteredNotifications(unreadNotifications);
   }, [notifications]);
 
   const handleMarkAsRead = (notificationId) => {
@@ -42,11 +43,24 @@ function NotificationDropdown() {
     setIsOpen((prev) => !prev);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       {/* Notification Icon */}
       <button onClick={toggleDropdown} className="relative focus:outline-none">
-        <span className="flex items-center p-2 text-green-400 hover:bg-gray-800 hover:text-yellow-400 rounded-md transition-all duration-200"><FaBell />
+        <span className="flex items-center p-2 text-green-400 hover:bg-gray-800 hover:text-yellow-400 rounded-md transition-all duration-200">
+          <FaBell />
         </span>
         {unreadCount > 0 && (
           <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
@@ -80,14 +94,12 @@ function NotificationDropdown() {
                       notification.alert_type === "above"
                         ? "risen above"
                         : "dropped below"
-                    } $${notification.target_price.toFixed(
-                      2
-                    )}.`}
+                    } $${notification.target_price.toFixed(2)}.`}
                   </p>
                   {!notification.read && (
                     <button
                       onClick={() => handleMarkAsRead(notification.id)}
-                      className="text-blue-400 hover:text-blue-600"
+                      className="px-2 bg-blue-500 text-white rounded-lg font-semibold shadow-md hover:bg-blue-600 hover:shadow-lg active:scale-95 transition-all duration-200"
                     >
                       Mark as Read
                     </button>

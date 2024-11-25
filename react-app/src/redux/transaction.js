@@ -1,3 +1,6 @@
+import { thunkAuthenticate } from "./session";
+import { thunkGetStocks } from "./stock";
+
 const SET_TRANSACTION_HISTORY = "transaction/setHistory";
 const ADD_TRANSACTION = "transaction/addTransaction";
 const REMOVE_TRANSACTION = "transaction/removeTransaction";
@@ -132,6 +135,8 @@ export const thunkBuyStock = (stockId, quantity) => async (dispatch) => {
   if (response.ok) {
     const data = await response.json();
     dispatch(addTransaction(data.shares));
+    dispatch(thunkGetStocks())
+    dispatch(thunkAuthenticate())
   } else {
     console.error("Failed to buy stock");
   }
@@ -148,6 +153,8 @@ export const thunkSellStock = (stockId, quantity) => async (dispatch) => {
   if (response.ok) {
     const data = await response.json();
     dispatch(addTransaction(data.shares));
+    dispatch(thunkGetStocks())
+    dispatch(thunkAuthenticate())
   } else {
     console.error("Failed to sell stock");
   }
@@ -193,8 +200,8 @@ export const thunkUpdateOrderStatus = (orderId, status) => async (dispatch) => {
     );
 
     if (response.ok) {
-      const data = await response.json();
-      dispatch(updateOrderStatus(orderId, status)); // 更新 Redux 状态
+      // const data = await response.json();
+      dispatch(updateOrderStatus(orderId, status));
     } else {
       console.error("Failed to update order status.");
     }

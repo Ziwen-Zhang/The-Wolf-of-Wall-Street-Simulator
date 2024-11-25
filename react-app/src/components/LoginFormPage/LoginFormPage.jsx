@@ -27,6 +27,7 @@ function LoginFormPage() {
     if (serverResponse) {
       setErrors(serverResponse);
     } else {
+      localStorage.removeItem("investingHistoryData")
       navigate("/");
     }
   };

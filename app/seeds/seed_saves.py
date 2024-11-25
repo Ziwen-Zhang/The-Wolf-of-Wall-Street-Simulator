@@ -1,4 +1,3 @@
-# app/seeds/seed_saves.py
 from app.models import db, Save, environment, SCHEMA
 from sqlalchemy import text
 

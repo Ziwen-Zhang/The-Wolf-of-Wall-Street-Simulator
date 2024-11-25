@@ -36,12 +36,15 @@ function ProfileButton() {
 
   const closeMenu = () => setShowMenu(false);
 
-  const logout = (e) => {
+  const logout = async (e) => {
     e.preventDefault();
+    dispatch({ type: "CLEAR_NON_STOCK_STATE" });
+    localStorage.removeItem("investingHistoryData")
     dispatch(thunkLogout());
     closeMenu();
-    navigate("/stocks/1")
+    navigate("/stocks/1");
   };
+  
 
   return (
     <div className="relative inline-block text-left">

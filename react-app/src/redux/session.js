@@ -1,5 +1,8 @@
 const SET_USER = 'session/setUser';
 const REMOVE_USER = 'session/removeUser';
+const SET_INVESTING_HISTORY = 'session/setInvestingHistory';
+const RESET_INVESTING_HISTORY = 'session/resetInvestingHistory';
+
 
 const setUser = (user) => {
   localStorage.setItem("user", JSON.stringify(user));
@@ -15,6 +18,22 @@ const removeUser = () => {
     type: REMOVE_USER,
   };
 };
+
+export const setInvestingHistory = (history) => {
+  localStorage.setItem("investingHistoryData", JSON.stringify(history));
+  return {
+    type: SET_INVESTING_HISTORY,
+    payload: history,
+  };
+};
+
+export const resetInvestingHistory = () => {
+  localStorage.removeItem("investingHistoryData");
+  return {
+    type: RESET_INVESTING_HISTORY,
+  };
+};
+
 
 export const thunkAuthenticate = () => async (dispatch) => {
 	const response = await fetch("/api/auth/");
@@ -72,9 +91,27 @@ export const thunkLogout = () => async (dispatch) => {
   dispatch(removeUser());
 };
 
+// const initialState = {
+//   user: JSON.parse(localStorage.getItem("user")) || null,
+//   investingHistory: JSON.parse(localStorage.getItem("investingHistoryData")) || {
+//     prices: [],
+//     timestamps: [],
+//   },
+//   // investingHistory: { prices: [], timestamps: [] }, 
+// };
+
 const initialState = {
-  user: JSON.parse(localStorage.getItem("user")) || null, // Restore user
+  user: JSON.parse(localStorage.getItem("user")) || null,
+  investingHistory: (() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user) {
+      const storedHistory = JSON.parse(localStorage.getItem("investingHistoryData"));
+      return storedHistory || { prices: [], timestamps: [] };
+    }
+    return { prices: [], timestamps: [] }
+  })(),
 };
+
 
 function sessionReducer(state = initialState, action) {
   switch (action.type) {
@@ -82,6 +119,10 @@ function sessionReducer(state = initialState, action) {
       return { ...state, user: action.payload };
     case REMOVE_USER:
       return { ...state, user: null };
+    case SET_INVESTING_HISTORY:
+      return { ...state, investingHistory: action.payload };
+    case RESET_INVESTING_HISTORY:
+      return { ...state, investingHistory: { prices: [], timestamps: [] } };
     default:
       return state;
   }

@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { thunkGetShares } from "../../redux/ownedshares"; 
 import { thunkGetStocks, startStockUpdates } from "../../redux/stock";
-
-import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
