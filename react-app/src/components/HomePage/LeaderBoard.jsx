@@ -30,19 +30,20 @@ function Leaderboard() {
 
   const getCurrentUserRank = () => {
     if (!currentUser || allUsers.length === 0) return "N/A";
-
-    // 根据 total_net_worth 排序并获取当前用户排名
     const sortedUsers = [...allUsers].sort(
-      (a, b) => b.total_net_worth - a.total_net_worth
+      (a, b) => 
+        (b.total_net_worth - b.bank_debt) - (a.total_net_worth - a.bank_debt)
     );
     const userIndex = sortedUsers.findIndex((user) => user.id === currentUser.id);
     return userIndex !== -1 ? userIndex + 1 : "N/A";
   };
-
   const sortedUsersWithRank = [...allUsers]
-    .sort((a, b) => b.total_net_worth - a.total_net_worth) // 根据 net_worth 排序
+    .sort((a, b) => 
+      (b.total_net_worth - b.bank_debt) - (a.total_net_worth - a.bank_debt)
+    )
     .map((user, index) => ({
       ...user,
+      adjusted_net_worth: user.total_net_worth - user.bank_debt,
       rank: index + 1,
     }));
 
@@ -75,7 +76,7 @@ function Leaderboard() {
                   <td className="p-4">{user.rank}</td>
                   <td className="p-4">{user.first_name}</td>
                   <td className="p-4">
-                    ${user.total_net_worth ? user.total_net_worth.toFixed(2) : "N/A"}
+                    ${user.total_net_worth ? (user.total_net_worth-user.bank_debt).toFixed(2) : "N/A"}
                   </td>
                 </tr>
               ))}

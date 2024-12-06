@@ -7,6 +7,7 @@ import {
   createSave,
 } from "../../redux/save";
 import { thunkGetStocks, startStockUpdates } from "../../redux/stock";
+import { fetchNotifications } from "../../redux/notification";
 
 function WatchlistPage() {
 
@@ -49,6 +50,7 @@ function WatchlistPage() {
     if (window.confirm("Are you sure you want to delete this save?")) {
       try {
         await dispatch(deleteSaveThunk(saveId));
+        await dispatch(fetchNotifications())
       } catch (error) {
         console.error("Failed to delete save:", error);
       }
