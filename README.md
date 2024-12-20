@@ -46,18 +46,18 @@ The Wolf of Wall Street Simulator is a full-stack web application that allows us
 ## **Getting Started**
 
 ### **Installation**
-#### Set up the backend environment:
-	1. Navigate to the backend directory:
+### Set up the backend environment:
+#### Navigate to the backend directory:
         cd app
-    2. Install dependencies: 
+#### Install dependencies: 
         pipenv install
-    3. Run database migration, seed, and start the server:
+#### Run database migration, seed, and start the server:
         pipenv run db
 
-#### Frontend Setup:
-    1.Navigate to the frontend directory:
+### Frontend Setup:
+#### Navigate to the frontend directory:
         cd ../react-app
-    2.Install dependencies:
+#### Install dependencies:
         npm install
-    3.Start the development server:
+#### Start the development server:
         npm start
